@@ -13,24 +13,24 @@ export function parametrizeRouteData (routeData: LocalizedRoute, query: { [id: s
   return parametrizedRoute
 }
 
-function prepareDynamicRoute (routeData: LocalizedRoute, fullPath: string, addToRoutes: boolean = true): RouteConfig[] {
+function prepareDynamicRoute (routeData: LocalizedRoute, path: string, addToRoutes: boolean = true): RouteConfig[] {
   const userRoute = RouterManager.findByName(routeData.name)
   if (userRoute) {
     if (addToRoutes) {
       const routes = []
-      const rootDynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + fullPath, name: `urldispatcher-${fullPath}` })
+      const rootDynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + path, name: `urldispatcher-${path}` })
       routes.push(rootDynamicRoute)
       if (config.storeViews.mapStoreUrlsFor.length > 0 && config.storeViews.multistore === true) {
         for (let storeCode of config.storeViews.mapStoreUrlsFor) {
           if (storeCode) {
-            const dynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + ((config.defaultStoreCode !== storeCode) ? (storeCode + '/') : '') + fullPath, name: `urldispatcher-${fullPath}-${storeCode}` })
+            const dynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + ((config.defaultStoreCode !== storeCode) ? (storeCode + '/') : '') + path, name: `urldispatcher-${path}-${storeCode}` })
             routes.push(dynamicRoute)
           }
         }
       }
       return routes
     } else {
-      const dynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + fullPath, name: `urldispatcher-${fullPath}` })
+      const dynamicRoute = Object.assign({}, userRoute, routeData, { path: '/' + path, name: `urldispatcher-${path}` })
       return [dynamicRoute]
     }
   } else {
@@ -38,8 +38,8 @@ function prepareDynamicRoute (routeData: LocalizedRoute, fullPath: string, addTo
   }
 }
 
-export function processDynamicRoute (routeData: LocalizedRoute, fullPath: string, addToRoutes: boolean = true): LocalizedRoute[] {
-  const preparedRoutes = prepareDynamicRoute(routeData, fullPath, addToRoutes)
+export function processDynamicRoute (routeData: LocalizedRoute, path: string, addToRoutes: boolean = true): LocalizedRoute[] {
+  const preparedRoutes = prepareDynamicRoute(routeData, path, addToRoutes)
   if (addToRoutes && preparedRoutes) {
     RouterManager.addRoutes(preparedRoutes, router)
   }
@@ -57,8 +57,8 @@ export function processMultipleDynamicRoutes (dispatcherMap: {}, addToRoutes: bo
   return preparedRoutes
 }
 
-export function findRouteByPath (fullPath: string): RouteConfig {
-  return RouterManager.findByPath(fullPath)
+export function findRouteByPath (path: string): RouteConfig {
+  return RouterManager.findByPath(path)
 }
 
 export function normalizeUrlPath (url: string): string {
@@ -89,11 +89,11 @@ export function formatProductLink (
     let routeData: LocalizedRoute;
     if (product.configurable_children && product.configurable_children.length > 0) {
       routeData = {
-        fullPath: product.url_path,
+        path: product.url_path,
         params: { childSku: product.sku }
       }
     } else {
-      routeData = { fullPath: product.url_path }
+      routeData = { path: product.url_path }
     }
     return localizedDispatcherRoute(routeData, storeCode)
   } else {

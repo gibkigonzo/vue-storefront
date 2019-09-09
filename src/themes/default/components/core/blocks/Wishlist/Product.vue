@@ -3,7 +3,7 @@
     <div class="image" @click="closeWishlist">
       <router-link :to="localizedRoute({
         name: product.type_id + '-product',
-        fullPath: product.url_path,
+        path: product.url_path,
         params: { parentSku: product.parentSku ? product.parentSku : product.sku, slug: product.slug, childSku: product.sku }
       })"
       >
@@ -14,7 +14,7 @@
       <div @click="closeWishlist">
         <router-link :to="localizedRoute({
           name: product.type_id + '-product',
-          fullPath: product.url_path,
+          path: product.url_path,
           params: { parentSku: product.parentSku ? product.parentSku : product.sku, slug: product.slug, childSku: product.sku }
         })"
         >
