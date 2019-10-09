@@ -73,7 +73,7 @@ export const ProductBundleOptions = {
     },
     isValid () {
       let isValid = true
-      this.validationResults.map((res) => { if (res.error) isValid = false })
+      // this.validationResults.map((res) => { if (res.error) isValid = false })
       return isValid
     },
     validateField (option, qty, optionId) {
