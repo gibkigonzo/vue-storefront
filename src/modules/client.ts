@@ -17,10 +17,14 @@ import { PaymentCashOnDeliveryModule } from './payment-cash-on-delivery'
 import { NewsletterModule } from '@vue-storefront/core/modules/newsletter'
 
 import { registerModule } from '@vue-storefront/core/lib/modules'
+import { urlStoreExtend, UrlModuleExtend, OldUrlModule } from 'theme/modules/urlExtend'
 
 // TODO:distributed across proper pages BEFORE 1.11
 export function registerClientModules () {
-  registerModule(UrlModule)
+  // 2. injected to module
+  // registerModule(UrlModule, {store: urlStoreExtend})
+  // 3. unregister store module and create new one
+  // registerModule(UrlModuleExtend)
   registerModule(CatalogModule)
   registerModule(CheckoutModule) // To Checkout
   registerModule(CartModule)
@@ -41,4 +45,6 @@ export function registerClientModules () {
 // Deprecated API, will be removed in 2.0
 export const registerModules: VueStorefrontModule[] = [
   // Example
+  // 4. 1.10v module registration
+  // OldUrlModule
 ]
