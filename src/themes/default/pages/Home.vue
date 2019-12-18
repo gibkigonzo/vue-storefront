@@ -1,6 +1,6 @@
 <template>
   <div id="home">
-    <head-image />
+    <head-image v-if="users" />
 
     <promoted-offers />
 
@@ -48,7 +48,7 @@ import Onboard from 'theme/components/theme/blocks/Home/Onboard'
 import PromotedOffers from 'theme/components/theme/blocks/PromotedOffers/PromotedOffers'
 import TileLinks from 'theme/components/theme/blocks/TileLinks/TileLinks'
 import { Logger } from '@vue-storefront/core/lib/logger'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import config from 'config'
 
 export default {
@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     ...mapGetters('user', ['isLoggedIn']),
+    ...mapState('example', ['users']),
     categories () {
       return this.getCategories
     },
