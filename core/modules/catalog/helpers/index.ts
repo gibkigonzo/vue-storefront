@@ -512,7 +512,7 @@ export function configureProductAsync (context, { product, configuration, select
       }/* else {
         Logger.debug('Skipping configurable options setup', configuration)()
       } */
-      const fieldsToOmit = ['name']
+      const fieldsToOmit = ['name', 'price', 'price_incl_tax', 'priceInclTax', 'specialPrice', 'special_price', 'specialPriceInclTax', 'special_price_incl_tax', 'original_price_incl_tax', 'original_price', 'originalPrice', 'originalPriceInclTax', 'final_price_incl_tax', 'finalPriceInclTax', 'finalPrice', 'final_price']
       if (!hasImage(selectedVariant)) fieldsToOmit.push('image')
       selectedVariant = omit(selectedVariant, fieldsToOmit) // We need to send the parent SKU to the Magento cart sync but use the child SKU internally in this case
       // use chosen variant for the current product
