@@ -43,12 +43,14 @@ const loadDateLocales = async (lang: string = 'en'): Promise<void> => {
 }
 
 export async function loadLanguageAsync (lang: string): Promise<string> {
-  await loadDateLocales(lang)
   if (!config.i18n.bundleAllStoreviewLanguages) {
     if (i18n.locale !== lang) {
       if (!loadedLanguages.includes(lang)) {
         try {
-          const msgs = await import(/* webpackChunkName: "lang-[request]" */ `./resource/i18n/${lang}.json`)
+          const [msgs] = await Promise.all([
+            import(/* webpackChunkName: "lang-[request]" */ `./resource/i18n/${lang}.json`),
+            loadDateLocales(lang)
+          ])
           i18n.setLocaleMessage(lang, msgs.default)
           loadedLanguages.push(lang)
           return setI18nLanguage(lang)
@@ -60,6 +62,7 @@ export async function loadLanguageAsync (lang: string): Promise<string> {
       return setI18nLanguage(lang)
     }
   } else {
+    loadDateLocales(lang)
     loadedLanguages.push(lang)
     return setI18nLanguage(lang)
   }

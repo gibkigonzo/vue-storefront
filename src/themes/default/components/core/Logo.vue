@@ -3,7 +3,7 @@
     <img
       :width="width"
       :height="height"
-      src="/assets/logo.svg"
+      v-lazy="'/assets/logo.svg'"
       :alt="$t(defaultTitle)"
     >
   </router-link>

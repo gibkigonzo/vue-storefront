@@ -17,7 +17,14 @@ function createRenderer (bundle, clientManifest, template) {
     cache: require('lru-cache')({
       max: 1000,
       maxAge: 1000 * 60 * 15
-    })
+    }),
+    shouldPrefetch: (file, type) => {
+      // type is inferred based on the file extension.
+      // https://fetch.spec.whatwg.org/#concept-request-destination
+      if (type === 'script') {
+        return false
+      }
+    }
   })
 }
 
