@@ -1,10 +1,20 @@
 import * as types from '../store/mutation-types';
 
 import { StorageManager } from '@vue-storefront/core/lib/storage-manager'
+import { tabSync } from '@vue-storefront/core/lib/tab-sync'
 
 export function cartCacheHandlerFactory (Vue) {
   return (mutation, state) => {
     const type = mutation.type;
+
+    if (
+      type.endsWith(types.CART_ADD_ITEM) ||
+      type.endsWith(types.CART_DEL_ITEM) ||
+      type.endsWith(types.CART_UPD_ITEM) ||
+      type.endsWith(types.CART_UPD_ITEM_PROPS)
+    ) {
+      tabSync.send('cart/load')
+    }
 
     if (
       type.endsWith(types.CART_LOAD_CART) ||
