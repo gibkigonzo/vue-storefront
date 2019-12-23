@@ -4,10 +4,7 @@ class TabSync {
   private callbacks = new Map()
   private quene = new Map()
   private lsName = 'vsf-tab-sync'
-  private constructor () {
-    console.log('');
-  }
-
+  private constructor () {} // eslint-disable-line no-useless-constructor
   private static instance: TabSync
   public static init () {
     if (!TabSync.instance) {

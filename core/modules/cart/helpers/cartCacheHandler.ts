@@ -11,6 +11,7 @@ export function cartCacheHandlerFactory (Vue) {
       type.endsWith(types.CART_ADD_ITEM) ||
       type.endsWith(types.CART_DEL_ITEM) ||
       type.endsWith(types.CART_UPD_ITEM) ||
+      type.endsWith(types.CART_DEL_NON_CONFIRMED_ITEM) ||
       type.endsWith(types.CART_UPD_ITEM_PROPS)
     ) {
       tabSync.send('cart/load')

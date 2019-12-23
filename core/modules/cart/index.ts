@@ -16,6 +16,6 @@ export const CartModule: StorefrontModule = function ({store}) {
   store.subscribe(cartCacheHandlerFactory(Vue))
   tabSync.listen('cart/load', async () => {
     console.log('load')
-    return store.dispatch('cart/sync', { forceClientState: true })
+    return store.dispatch('cart/sync', { forceClientState: false })
   })
 }
