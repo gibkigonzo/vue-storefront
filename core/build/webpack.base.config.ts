@@ -9,6 +9,7 @@ import HTMLPlugin from 'html-webpack-plugin';
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 import webpack from 'webpack';
 import dayjs from 'dayjs';
+import LodashModuleReplacementPlugin from 'lodash-webpack-plugin';
 
 fs.writeFileSync(
   path.resolve(__dirname, './config.json'),
@@ -61,6 +62,7 @@ const isProd = process.env.NODE_ENV === 'production'
 // todo: usemultipage-webpack-plugin for multistore
 export default {
   plugins: [
+    new LodashModuleReplacementPlugin(),
     new webpack.ContextReplacementPlugin(/dayjs[/\\]locale$/, buildLocaleIgnorePattern()),
     new webpack.ProgressPlugin(),
     // new BundleAnalyzerPlugin({
@@ -168,7 +170,10 @@ export default {
           path.resolve(__dirname, '../../node_modules/@vue-storefront'),
           path.resolve(__dirname, '../../src'),
           path.resolve(__dirname, '../../core')
-        ]
+        ],
+        options: {
+          plugins: ['lodash']
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
