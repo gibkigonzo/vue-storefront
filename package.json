@@ -35,6 +35,7 @@
     "all": "cross-env NODE_ENV=development node ./core/scripts/all",
     "cache": "node ./core/scripts/cache",
     "dev": "cross-env TS_NODE_PROJECT=\"tsconfig-build.json\" ts-node ./core/scripts/server.ts",
+    "dev:spa": "cross-env TS_NODE_PROJECT=\"tsconfig-build.json\" webpack-dev-server --config ./core/build/webpack.spa.config.ts",
     "dev:sw": "cross-env TS_NODE_PROJECT=\"tsconfig-build.json\" yarn build:sw && yarn dev",
     "dev:inspect": "cross-env TS_NODE_PROJECT=\"tsconfig-build.json\" node --inspect -r ts-node/register ./core/scripts/server",
     "build:sw": "cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-build.json\" webpack --config ./core/build/webpack.prod.sw.config.ts --mode production --progress --hide-modules",

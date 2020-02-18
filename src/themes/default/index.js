@@ -28,8 +28,9 @@ function initTheme (app, router, store, config, ssrContext) {
   // To do so, exclude the desired storeView from the config.storeViews.mapStoreUrlsFor, set appendStoreCode = false, and map all the urls by your own like:
   // { name: 'de-checkout', path: '/checkout', component: CheckoutCustomized }
   // The 4th parameter is the route priority - a higher number will ensure the theme routes override any module routes. The default is 0.
-  setupMultistoreRoutes(config, router, routes, 10)
+  // setupMultistoreRoutes(config, router, routes, 10)
 
+  router.addRoutes(routes)
   StorageManager.init('claims');
   store.registerModule('claims', claimsStore);
   store.registerModule('homepage', homepageStore);
