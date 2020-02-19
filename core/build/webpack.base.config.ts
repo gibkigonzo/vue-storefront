@@ -8,6 +8,7 @@ import autoprefixer from 'autoprefixer';
 import HTMLPlugin from 'html-webpack-plugin';
 import webpack from 'webpack';
 import dayjs from 'dayjs';
+import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin'
 
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -97,6 +98,11 @@ export default {
     new webpack.DefinePlugin({
       'process.env.__APPVERSION__': JSON.stringify(require('../../package.json').version),
       'process.env.__BUILDTIME__': JSON.stringify(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+    }),
+    new ExtractCssChunksPlugin({
+      filename: isProd ? '[name].[hash].css' : '[name].css',
+      chunkFilename: isProd ? '[name].[hash].css' : '[name].css',
+      ignoreOrder: true
     })
   ],
   devtool: 'source-map',
@@ -179,34 +185,19 @@ export default {
         }
       },
       {
-        test: /\.css$/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
           'vue-style-loader',
-          'css-loader',
-          postcssConfig
-        ]
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          'vue-style-loader',
+          {
+            loader: ExtractCssChunksPlugin.loader,
+            options: {
+              hot: !isProd,
+              reloadAll: !isProd
+            }
+          },
           'css-loader',
           postcssConfig,
           'sass-loader'
-        ]
-      },
-      {
-        test: /\.sass$/,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-          postcssConfig,
-          {
-            loader: 'sass-loader',
-            options: {
-              indentedSyntax: true
-            }
-          }
         ]
       },
       {

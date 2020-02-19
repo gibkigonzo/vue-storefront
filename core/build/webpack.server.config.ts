@@ -34,6 +34,9 @@ export default merge(base, {
     new webpack.DefinePlugin({
       'process.env.VUE_ENV': '"server"'
     }),
-    new VueSSRPlugin()
+    new VueSSRPlugin(),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1
+    })
   ]
 })
