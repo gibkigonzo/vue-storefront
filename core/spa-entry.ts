@@ -66,8 +66,6 @@ const invokeClientEntry = async () => {
     }
     const asyncDataPromises = matched.map(async (c: any) => { // TODO: update me for mixins support
       const components = c.mixins && globalConfig.ssr.executeMixedinAsyncData ? Array.from(c.mixins) : []
-      await ssrHydrateSubcomponents(union(components, [c]), to, 'preAsyncData')
-      Logger.debug('preAsyncData executed')()
       if (c.asyncData) {
         await c.asyncData({ store, route: to })
         Logger.debug('Top-most asyncData executed')()
