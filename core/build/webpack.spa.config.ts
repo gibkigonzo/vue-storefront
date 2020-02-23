@@ -154,6 +154,9 @@ const config = merge(base, {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
+    new CopyWebpackPlugin([
+      { from: themeRoot + '/assets', to: 'assets' }
+    ]),
     new webpack.ContextReplacementPlugin(/dayjs[/\\]locale$/, buildLocaleIgnorePattern()),
     new webpack.ProgressPlugin(),
     new CaseSensitivePathsPlugin(),

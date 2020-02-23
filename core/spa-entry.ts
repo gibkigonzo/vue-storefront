@@ -9,6 +9,8 @@ import '@vue-storefront/core/service-worker/registration' // register the servic
 import { AsyncDataLoader } from './lib/async-data-loader'
 import { Logger } from '@vue-storefront/core/lib/logger'
 import globalConfig from 'config'
+import { RouterManager } from './lib/router-manager';
+import EventBus from '@vue-storefront/core/compatibility/plugins/event-bus'
 declare var window: any
 
 const createCommonErrorHandler = ({ store, router }) => (err, next) => {
@@ -44,9 +46,14 @@ const createSsrHydrateSubcomponents = ({ store }) => async (components, to, asyn
 
 const invokeClientEntry = async () => {
   const { app, router, store } = await createApp(null, globalConfig, null)
-  app.$mount('#app')
+  app.$mount('#app');
+
+  await store.dispatch('url/registerDynamicRoutes')
+  RouterManager.flushRouteQueue()
+
   const ssrHydrateSubcomponents = createSsrHydrateSubcomponents({ store })
   const commonErrorHandler = createCommonErrorHandler({ store, router })
+
   router.beforeResolve(async (to, from, next) => {
     const matched = router.getMatchedComponents(to)
     if (to) { // this is from url
