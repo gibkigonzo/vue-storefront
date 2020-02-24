@@ -4,6 +4,27 @@ import base from './webpack.base.config';
 import SWPrecachePlugin from 'sw-precache-webpack-plugin';
 
 const isSpa = process.argv.includes('--spa')
+
+const staticFileGlobs = isSpa
+  ? [
+    '**.*.js',
+    '**.*.json',
+    '**.*.css',
+    'assets/**.*',
+    'assets/ig/**.*',
+    'index.html',
+    '/'
+  ]
+  : [
+    'dist/**.*.js',
+    'dist/**.*.json',
+    'dist/**.*.css',
+    'assets/**.*',
+    'assets/ig/**.*',
+    'index.html',
+    '/'
+  ]
+
 module.exports = merge(base, {
   mode: 'production',
   target: 'web',
@@ -20,15 +41,7 @@ module.exports = merge(base, {
       cacheId: 'vue-sfr',
       filename: 'service-worker.js',
       staticFileGlobsIgnorePatterns: [/\.map$/],
-      staticFileGlobs: [
-        'dist/**.*.js',
-        'dist/**.*.json',
-        'dist/**.*.css',
-        'assets/**.*',
-        'assets/ig/**.*',
-        'index.html',
-        '/'
-      ],
+      staticFileGlobs,
       runtimeCaching: [
         {
           // eslint-disable-next-line no-useless-escape
