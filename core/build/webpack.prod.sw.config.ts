@@ -3,6 +3,7 @@ import merge from 'webpack-merge';
 import base from './webpack.base.config';
 import SWPrecachePlugin from 'sw-precache-webpack-plugin';
 
+const isSpa = process.argv.includes('--spa')
 module.exports = merge(base, {
   mode: 'production',
   target: 'web',
@@ -83,7 +84,7 @@ module.exports = merge(base, {
           urlPattern: '/assets/ig/(.*)',
           handler: 'fastest'
         }, {
-          urlPattern: '/dist/(.*)',
+          urlPattern: isSpa ? '/(.*)' : '/dist/(.*)',
           handler: 'fastest'
         }, {
           urlPattern: '/*/*', /** this is new product URL format  */
@@ -97,7 +98,7 @@ module.exports = merge(base, {
           urlPattern: '/*', /** this is new category URL format  */
           handler: 'networkFirst'
         }],
-      'importScripts': ['/dist/core-service-worker.js'] /* custom logic */
+      'importScripts': [isSpa ? '/core-service-worker.js' : '/dist/core-service-worker.js'] /* custom logic */
     })
   ]
 })
