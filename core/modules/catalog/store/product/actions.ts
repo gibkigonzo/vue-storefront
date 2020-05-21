@@ -301,7 +301,7 @@ const actions: ActionTree<ProductState, RootState> = {
   preConfigureAssociated (context, { searchResult, prefetchGroupProducts }) {
     const { storeCode, appendStoreCode } = currentStoreView()
     for (let product of searchResult.items) {
-      if (product.url_path) {
+      if (product.url_path && product.visibility !== 1) {
         const { parentSku, slug } = product
 
         context.dispatch('url/registerMapping', {
@@ -362,6 +362,12 @@ const actions: ActionTree<ProductState, RootState> = {
     const searchQuery = new SearchQuery()
     const query = searchQuery.applyFilter({ key: 'configurable_children.sku', value: { 'eq': product.sku } })
     const products = await context.dispatch('findProducts', { query, configuration })
+    return products.items && products.items.length > 0 ? products.items[0] : null
+  },
+  async findGroupedParent (context, { product }) {
+    const searchQuery = new SearchQuery()
+    const query = searchQuery.applyFilter({ key: 'product_links.linked_product_sku', value: { 'eq': product.sku } })
+    const products = await context.dispatch('findProducts', { query })
     return products.items && products.items.length > 0 ? products.items[0] : null
   },
   /**
@@ -639,14 +645,6 @@ const actions: ActionTree<ProductState, RootState> = {
     const product = await dispatch('single', { options: productSingleOptions })
     if (product.status >= 2) {
       throw new Error(`Product query returned empty result product status = ${product.status}`)
-    }
-    if (product.visibility === 1) { // not visible individually (https://magento.stackexchange.com/questions/171584/magento-2-table-name-for-product-visibility)
-      if (config.products.preventConfigurableChildrenDirectAccess) {
-        const parentProduct = await dispatch('findConfigurableParent', { product })
-        checkParentRedirection(product, parentProduct)
-      } else {
-        throw new Error(`Product query returned empty result product visibility = ${product.visibility}`)
-      }
     }
 
     await dispatch('loadProductAttributes', { product })

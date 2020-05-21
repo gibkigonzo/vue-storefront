@@ -1,3 +1,4 @@
+import { checkParentRedirection } from '@vue-storefront/core/modules/catalog/events';
 import { isServer } from '@vue-storefront/core/helpers';
 import { UrlState } from '../types/UrlState'
 import { ActionTree } from 'vuex';
@@ -56,8 +57,8 @@ export const actions: ActionTree<UrlState, any> = {
           return resolve(parametrizeRouteData(routeData, query, storeCodeInPath))
         } else {
           dispatch('mappingFallback', { url, params: parsedQuery }).then(mappedFallback => {
-            const routeData = getFallbackRouteData({ mappedFallback, url })
-            dispatch('registerMapping', { url, routeData }) // register mapping for further usage
+            const { url: returnedUrl, ...routeData } = getFallbackRouteData({ mappedFallback, url })
+            dispatch('registerMapping', { url: returnedUrl, routeData }) // register mapping for further usage
             resolve(parametrizeRouteData(routeData, query, storeCodeInPath))
           }).catch(reject)
         }
@@ -69,30 +70,33 @@ export const actions: ActionTree<UrlState, any> = {
    * Router mapping fallback - get the proper URL from API
    * This method could be overriden in custom module to provide custom URL mapping logic
    */
-  async mappingFallback ({ dispatch }, { url, params }: { url: string, params: any}) {
+  async mappingFallback (context, { url, params }: { url: string, params: any}) {
     const { storeCode, appendStoreCode } = currentStoreView()
     const productQuery = new SearchQuery()
     url = (removeStoreCodeFromRoute(url.startsWith('/') ? url.slice(1) : url) as string)
     productQuery.applyFilter({ key: 'url_path', value: { 'eq': url } }) // Tees category
-    const products = await dispatch('product/list', { query: productQuery }, { root: true })
+    const products = await context.dispatch('product/list', { query: productQuery }, { root: true })
     if (products && products.items && products.items.length) {
-      const product = products.items[0]
+      let product = products.items[0]
+      product = await checkParentRedirection(context, product)
       return {
         name: localizedDispatcherRouteName(product.type_id + '-product', storeCode, appendStoreCode),
         params: {
           slug: product.slug,
-          parentSku: product.sku,
+          parentSku: product.parentSku || product.sku,
           childSku: params['childSku'] ? params['childSku'] : product.sku
-        }
+        },
+        url: product.url_path
       }
     } else {
-      const category = await dispatch('category/single', { key: 'url_path', value: url }, { root: true })
+      const category = await context.dispatch('category/single', { key: 'url_path', value: url }, { root: true })
       if (category !== null) {
         return {
           name: localizedDispatcherRouteName('category', storeCode, appendStoreCode),
           params: {
             slug: category.slug
-          }
+          },
+          url: category.url_path
         }
       }
     }
@@ -100,7 +104,7 @@ export const actions: ActionTree<UrlState, any> = {
   setCurrentRoute ({ commit, state, rootGetters }, { to, from } = {}) {
     commit(types.SET_CURRENT_ROUTE, {
       ...to,
-      scrollPosition: {...state.prevRoute.scrollPosition},
+      scrollPosition: { ...state.prevRoute.scrollPosition },
       categoryPageSize: state.prevRoute.categoryPageSize
     })
 

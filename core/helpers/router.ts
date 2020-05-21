@@ -10,6 +10,11 @@ once('__VUE_EXTEND_PUSH_RR__', () => {
     if (onComplete || onAbort) return originalPush.call(this, location, onComplete, onAbort)
     return originalPush.call(this, location).catch(err => err)
   }
+  const originalReplace = VueRouter.prototype.replace
+  VueRouter.prototype.replace = function replace (location: RawLocation, onComplete: Function = () => {}, onAbort?: ErrorHandler): Promise<Route> {
+    if (onComplete || onAbort) return originalReplace.call(this, location, onComplete, onAbort)
+    return originalReplace.call(this, location).catch(err => err)
+  }
 })
 
 export const createRouter = (): VueRouter => {

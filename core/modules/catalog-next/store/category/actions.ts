@@ -114,7 +114,7 @@ const actions: ActionTree<CategoryState, RootState> = {
   },
   async registerCategoryProductsMapping ({ dispatch }, products = []) {
     const { storeCode, appendStoreCode } = currentStoreView()
-    await Promise.all(products.map(product => {
+    await Promise.all(products.filter((product) => product.visibility !== 1).map(product => {
       const { url_path, sku, slug, type_id } = product
       return dispatch('url/registerMapping', {
         url: localizedDispatcherRoute(url_path, storeCode),

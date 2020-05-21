@@ -8,6 +8,7 @@ import { formatProductLink } from '@vue-storefront/core/modules/url/helpers';
 import { Logger } from '@vue-storefront/core/lib/logger';
 import { isServer } from '@vue-storefront/core/helpers';
 import { router } from '@vue-storefront/core/app'
+import { routerHelper } from '@vue-storefront/core/helpers'
 
 // Listeners moved from Product.js
 
@@ -117,11 +118,15 @@ export const onUserPricesRefreshed = async (store, router) => {
   }
 }
 
-export const checkParentRedirection = (currentProduct, parentProduct) => {
-  if (parentProduct && parentProduct.id !== currentProduct.id && config.products.preventConfigurableChildrenDirectAccess) {
-    Logger.log('Redirecting to parent, configurable product', parentProduct.sku)()
-    parentProduct.parentSku = parentProduct.sku
-    parentProduct.sku = currentProduct.sku
+export const checkParentRedirection = async (context, product) => {
+  if (product.visibility !== 1 || !config.products.preventConfigurableChildrenDirectAccess) return product
+
+  const parentProduct = (await Promise.all([
+    context.dispatch('product/findGroupedParent', { product }, { root: true }),
+    context.dispatch('product/findConfigurableParent', { product }, { root: true })
+  ])).filter(Boolean)[0]
+  if (parentProduct && parentProduct.id !== product.id) {
+    Logger.log('Redirecting to parent', parentProduct.sku)()
     const parentUrl = formatProductLink(parentProduct, currentStoreView().storeCode)
     if (isServer) {
       AsyncDataLoader.push({
@@ -132,7 +137,14 @@ export const checkParentRedirection = (currentProduct, parentProduct) => {
         }
       })
     } else {
-      router.replace(parentUrl as string)
+      router.afterEach(() => {
+        router.replace(parentUrl as string)
+        routerHelper.popStateDetected = true
+        ;(router as any).afterHooks = (router as any).afterHooks.filter((f) => f.name !== 'afterEachOnce')
+      })
     }
+    return parentProduct
   }
+
+  return product
 }
