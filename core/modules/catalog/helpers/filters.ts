@@ -25,7 +25,7 @@ const getSelectedFiltersByProduct = (product: Product, configuration: ProductCon
     Object.keys(configuration).map(filterType => {
       const filter = configuration[filterType]
       selectedFilters[filterType] = {
-        id: filter.id,
+        id: filter.id || product[filterType],
         label: filter.label,
         type: filterType
       }
