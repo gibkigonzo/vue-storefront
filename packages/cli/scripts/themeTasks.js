@@ -5,7 +5,7 @@ const semverInc = require('semver/functions/inc')
 const semverSatisfies = require('semver/functions/satisfies')
 const semverCoerce = require('semver/functions/coerce')
 const merge = require('lodash/merge')
-const themes = require('./consts').themes
+const { themes } = require('./consts')
 const { getVersion } = require('./helpers')
 
 const createThemeTasks = (installationDir = 'vue-storefront') => ({

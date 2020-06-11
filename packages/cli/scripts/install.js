@@ -6,7 +6,7 @@ const execa = require('execa')
 const spawn = require('child_process')
 const fs = require('fs')
 const semverSortDesc = require('semver/functions/rsort')
-const options = require('./consts').options
+const { options } = require('./consts')
 const { createThemeTasks, createThemePrompt } = require('./themeTasks')
 
 module.exports = function (installationDir) {
