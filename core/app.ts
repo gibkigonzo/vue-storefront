@@ -103,7 +103,7 @@ const createApp = async (ssrContext, config, storeCode = null): Promise<{app: Vu
   }
 
   injectReferences(app, store, routerProxy, globalConfig)
-  registerClientModules()
+  await registerClientModules()
   registerModules(enabledModules, appContext)
   registerTheme(globalConfig.theme, app, routerProxy, store, globalConfig, ssrContext)
 

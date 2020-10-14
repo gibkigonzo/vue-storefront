@@ -16,12 +16,13 @@ import { PaymentBackendMethodsModule } from './payment-backend-methods'
 import { PaymentCashOnDeliveryModule } from './payment-cash-on-delivery'
 import { NewsletterModule } from '@vue-storefront/core/modules/newsletter'
 import { InitialResourcesModule } from '@vue-storefront/core/modules/initial-resources'
+import { FancyModule } from './fancy'
 
 // import { DeviceModule } from './device/index';
 import { registerModule } from '@vue-storefront/core/lib/modules'
 
 // TODO:distributed across proper pages BEFORE 1.11
-export function registerClientModules () {
+export async function registerClientModules () {
   registerModule(UrlModule)
   registerModule(CatalogModule)
   registerModule(CheckoutModule) // To Checkout
@@ -40,6 +41,7 @@ export function registerClientModules () {
   registerModule(NewsletterModule)
   registerModule(InitialResourcesModule)
   // registerModule(DeviceModule)
+  await registerModule(FancyModule)
 }
 
 // Deprecated API, will be removed in 2.0

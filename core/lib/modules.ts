@@ -23,9 +23,9 @@ function injectReferences (app: any, store: Store<any>, router: VueRouter, confi
   refs.config = config
 }
 
-function registerModule (module: StorefrontModule, config?: any) {
+async function registerModule (module: StorefrontModule, config?: any) {
   if (!registeredModules.includes(module)) {
-    module({
+    await module({
       app: refs.app,
       store: refs.store,
       router: refs.router,
