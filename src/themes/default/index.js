@@ -12,6 +12,7 @@ import { homepageStore } from 'theme/store/homepage'
 import { uiStore } from 'theme/store/ui'
 import { promotedStore } from 'theme/store/promoted-offers'
 import { StorageManager } from '@vue-storefront/core/lib/storage-manager'
+import { injectDeviceTests } from 'src/modules/device-new'
 
 once('__VUE_EXTEND_DROPPOINT_VPB__', () => {
   Vue.use(VueProgressBar)
@@ -19,6 +20,11 @@ once('__VUE_EXTEND_DROPPOINT_VPB__', () => {
 
 const themeEntry = App
 function initTheme (app, router, store, config, ssrContext) {
+  injectDeviceTests({
+    app,
+    config,
+    ssrContext
+  })
   store.registerModule('themeCart', cartModule)
   // Register theme routes for the current store. In a single store setup this will add routes exactly as they are in the router definition file '[theme]/router/index.js'
   // In a multistore setup, it depends on the config setting 'appendStoreCode' for the current store

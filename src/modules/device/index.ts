@@ -18,17 +18,17 @@ export const DeviceModule: StorefrontModule = async function ({ app, appConfig }
       ? headersOrUserAgent
       : headersOrUserAgent['user-agent']
 
-    Vue.prototype.$device = deviceLibrary.default(userAgent, appConfig.device.tests)
+    Vue.prototype.$device2 = deviceLibrary.default(userAgent, appConfig.device.tests)
     if (userAgent === 'Amazon CloudFront') {
       if (headersOrUserAgent['cloudfront-is-mobile-viewer'] === 'true') {
-        Vue.prototype.$device.isMobile = true
-        Vue.prototype.$device.isMobileOrTablet = true
+        Vue.prototype.$device2.isMobile = true
+        Vue.prototype.$device2.isMobileOrTablet = true
       }
       if (headersOrUserAgent['cloudfront-is-tablet-viewer'] === 'true') {
-        Vue.prototype.$device.isMobile = false
-        Vue.prototype.$device.isMobileOrTablet = true
+        Vue.prototype.$device2.isMobile = false
+        Vue.prototype.$device2.isMobileOrTablet = true
       }
     }
-    (app as any).device = Vue.prototype.$device
+    (app as any).device2 = Vue.prototype.$device2
   }
 }

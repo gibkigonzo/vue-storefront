@@ -51,6 +51,7 @@ import OfflineBadge from 'theme/components/core/OfflineBadge.vue'
 import { isServer } from '@vue-storefront/core/helpers'
 import Head from 'theme/head'
 import config from 'config'
+import LazyHydrate from 'vue-lazy-hydration'
 
 const SidebarMenu = () => import(/* webpackPreload: true */ /* webpackChunkName: "vsf-sidebar-menu" */ 'theme/components/core/blocks/SidebarMenu/SidebarMenu.vue')
 const Microcart = () => import(/* webpackPreload: true */ /* webpackChunkName: "vsf-microcart" */ 'theme/components/core/blocks/Microcart/Microcart.vue')
@@ -94,7 +95,22 @@ export default {
     }
   },
   serverPrefetch () {
-    return this.fetchMenuData()
+    return new Promise(async (resolve) => {
+      await this.fetchMenuData()
+      let timeout = setInterval(() => {
+        try {
+          console.log('--------------------------------------------')
+          console.log('BEFORE-------------', this.$route.query.test, `isMobile === ${this.$device2.isMobile}`)
+          console.log('AFTER--------------', this.$route.query.test, `isMobile === ${this.$device.isMobile}`)
+        } catch (err) {
+          console.error(err)
+        }
+      }, 100)
+      setTimeout(() => {
+        clearInterval(timeout)
+        resolve()
+      }, 5000)
+    })
   },
   beforeMount () {
     // Progress bar on top of the page
@@ -113,6 +129,7 @@ export default {
   },
   metaInfo: Head,
   components: {
+    LazyHydrate,
     MainHeader,
     MainFooter,
     SidebarMenu, // eslint-disable-line vue/no-unused-components

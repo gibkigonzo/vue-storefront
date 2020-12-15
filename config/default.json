@@ -893,5 +893,18 @@
     "nginx",
     "varnish",
     "cloudflare"
-  ]
+  ],
+  "device": {
+    "appendToInstance": true,
+    "tests": [
+      "isMobile",
+      "isMobileOrTablet",
+      "isTablet",
+      "isDesktop",
+      "isDesktopOrTablet",
+      "isIos",
+      "isWindows",
+      "isMacOS"
+    ]
+  }
 }
