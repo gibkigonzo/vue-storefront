@@ -87,7 +87,7 @@ The mechanism of injecting core business logic into themes is ridiculously simpl
 
 So assume we have a core Microcart component with business logic as above (left side), we can easily inject it into any of our theme components (right side) just by importing it and adding as a mixin `mixins: [Microcart]`. This is all you need to make use of core business logic inside your theme. With this approach, we can easily ship updates to all core components without breaking your shop.
 
-The easiest way to create your own theme is to create a copy of the default one, change its name in its `package.json` file, change the active theme in `config/local.json` and run `yarn` to make [Lerna](https://github.com/lerna/lerna) linking (which we use for monorepos).
+[Check how to create theme based on our official themes](https://docs.vuestorefront.io/guide/installation/theme.html).
 
 ## Offline mode and cache
 Vue Storefront still works even while the user is offline.
@@ -113,7 +113,7 @@ You may not believe me but this is all you need to know to start working with Vu
 ## Useful Links
 
 - [Documentation](https://docs.vuestorefront.io/)
-- [Community slack invitation link](https://join.slack.com/t/vuestorefront/shared_invite/enQtMzA4MTM2NTE5NjM2LTI1M2RmOWIyOTk0MzFlMDU3YzJlYzcyYzNiNjUyZWJiMTZjZjc3MjRlYmE5ZWQ1YWRhNTQyM2ZjN2ZkMzZlNTg)
+- [Community slack invitation link](https://join.slack.com/t/vuestorefront/shared_invite/enQtOTUwNjQyNjY5MDI0LWFmYzE4NTYxNDBhZDRlMjM5MDUzY2RiMjU0YTRjYWQ3YzdkY2YzZjZhZDZmMDUwMWQyOWRmZjQ3NDgwZGQ3NTk)
 - [Project structure explained](https://docs.vuestorefront.io/guide/basics/project-structure.html)
 - [Configuration file explained](https://docs.vuestorefront.io/guide/basics/configuration.html)
 - [Extending Vue Storefront](https://docs.vuestorefront.io/guide/extensions/introduction.html)

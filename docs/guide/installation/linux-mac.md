@@ -10,7 +10,7 @@ Let's go!
 
   Already included in `vue-storefront` and `vue-storefront-api` Docker images (required locally, if you do not use containerization):
 
-- Node.js [Active LTS](https://nodejs.org/en/) (>=8.0.0)
+- Node.js [Active LTS](https://nodejs.org/en/) (>=10.x)
 - [Yarn](https://yarnpkg.com/en/docs/install) (>=1.0.0)
 - [ImageMagick](https://www.imagemagick.org/script/index.php) (to fit, resize and crop images)
 
@@ -42,6 +42,20 @@ In this case you don't need to run Docker and you will be asked one additional q
 ```
 
 You can simply proceed and as a result you will have a `vue-storefront` folder inside your project root and Storefront application running on `http://localhost:3000`. All images will be also hosted at `https://demo.vuestorefront.io/img/`.
+
+### Theme
+
+You will get question about official theme installation and its version.
+```
+? Select theme for Vue Storefront (Use arrow keys)
+❯ Capybara - based on Storefront UI 
+  Default
+```
+```
+? Select theme version (Use arrow keys)
+❯ Stable version (recommended for production) 
+  In development branch (could be unstable!) 
+```
 
 ### Installing the vue-storefront-api locally
 
@@ -185,6 +199,8 @@ nano config/local.json
 ```
 
 The default config file should work perfectly fine for default purposes.
+
+Next [install theme](theme.md)
 
 Finally, you have to choose between two modes of running the application (similarly as in the case of vue-storefront-api).
 

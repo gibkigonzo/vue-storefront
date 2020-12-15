@@ -1,5 +1,10 @@
 # Themes in Vue Storefront
 
+:::tip REMINDER
+This guide is based on `default` theme before `1.12` version release. General idea and structure addressed here were created based on the pre-`1.12` `default` theme. 
+:::
+
+
 Vue Storefront allows you to quickly develop your own themes and use our core business logic. All e-commerce features are implemented in core, so you can easily develop fully working online shop only by writing HTML and CSS and inheriting the business logic from the core. Of course, you can easily modify and extend the core logic in your theme.
 
 You can read more about Vue Storefront core components and how to make use of them [here](core-components.md)
@@ -19,7 +24,7 @@ To do so:
 1. Copy the `default` folder located in `src/themes` and change its name to your new theme's name.
 2. Change the `name` property in your theme's `package.json` file.
 3. Insert this name in the `theme` property of your config file in `config/local.json`.
-4. Run `yarn install` so lerna can detect a new theme.
+4. Run `yarn install` so _lerna_ can detect a new theme.
 5. Start developing your own theme for Vue Storefront!
 
 Only official themes tested and accepted by the community should be in a `master` branch. Please develop your own themes on separate branches and keep them updated with `master` to be sure it works with the newest core.
@@ -29,14 +34,14 @@ Only official themes tested and accepted by the community should be in a `master
 Each theme is a separate Vue.js application with its own dependencies, which can make use of the core or even modify it.
 Below you can find the list of files that are essential for your theme to work:
 
-- `extensions` - theme-specific extension
-  - `index.js` - here you can register your theme-specific extensions
-- `filters` - theme-specific filters (extends `core/filters`)
-  - `index.js` - here you can register your theme-specific filters
+- `assets` - theme-specific assets
+- `components` - theme-specific components
+- `css` - theme-specific css files
+- `helpers` - helper methods
+- `layouts` - layout files
 - `mixins` - theme-specific mixins (extends `core/mixins`)
   - `index.js` - here you can register your theme-specific mixins
 - `pages` - your shop pages
-- `plugins` - theme-specific plugins (extends `core/plugins`, see [Working with plugins](plugins.md)
 - `resource` - theme-specific resources (extends `core/resource`)
 - `router` - theme router
 - `store` - theme-specific stores (extends `core/store`)
@@ -49,10 +54,10 @@ Below you can find the list of files that are essential for your theme to work:
   - `index.js` you can extend core service worker here (see [Working with Service Workers](service-workers.md)
 - `webpack.config.js` - you can extend core webpack build in this file (extends `core/build/`, see [Working with webpack](webpack.md))
 
-## Official Vue Storefront themes included with the template:
+## Official Vue Storefront themes:
 
-- `default` - Default VS theme always with the newest features. The easiest way to adopt VS in your shop is taking this one and modifying it to your needs (check [gogetgold.com](https://www.gogetgold.com/) as an example)
-- `catalog` - VS catalog theme - currently in alpha
+- [Capybara](https://github.com/DivanteLtd/vsf-capybara) - Capybara is a Storefront UI based theme for Vue Storefront.
+- [Default](https://github.com/DivanteLtd/vsf-default) - Default VS theme always with the newest features. The easiest way to adopt VS in your shop is taking this one and modifying it to your needs (check [gogetgold.com](https://www.gogetgold.com/) as an example)
 
 ## Related
 

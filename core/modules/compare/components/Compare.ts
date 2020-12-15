@@ -1,23 +1,24 @@
+import { mapGetters } from 'vuex'
 import Product from '@vue-storefront/core/modules/catalog/types/Product'
 import compareMountedMixin from '@vue-storefront/core/modules/compare/mixins/compareMountedMixin'
+import config from 'config'
 
 export const Compare = {
   name: 'Compare',
   mixins: [compareMountedMixin],
   computed: {
-    items (): Product[] {
-      return this.$store.state.compare.items
-    },
-    allComparableAttributes () {
-      const attributesByCode = this.$store.getters['attribute/attributeListByCode']
-      return Object.values(attributesByCode).filter((a: any) => parseInt(a.is_comparable))
-    }
+    ...mapGetters({
+      items: 'compare/getCompareItems',
+      allComparableAttributes: 'attribute/getAllComparableAttributes'
+    })
   },
   created () {
-    this.$store.dispatch('attribute/list', {
-      filterValues: [true],
-      filterField: 'is_user_defined'
-    })
+    if (!config.entities.attribute.loadByAttributeMetadata) {
+      this.$store.dispatch('attribute/list', {
+        filterValues: [],
+        filterField: 'is_user_defined'
+      })
+    }
   },
   methods: {
     removeFromCompare (product: Product) {

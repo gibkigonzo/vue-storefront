@@ -12,14 +12,19 @@ import config from 'config'
 import i18n from '@vue-storefront/i18n'
 import rootStore from '@vue-storefront/core/store'
 import { currentStoreView } from '@vue-storefront/core/lib/multistore'
-const storeView = currentStoreView()
+import { registerModule } from '@vue-storefront/core/lib/modules'
+import { OrderModule } from '@vue-storefront/core/modules/order'
+import { Logger } from '@vue-storefront/core/lib/logger'
 
 export default {
   name: 'InstantCheckoutButton',
+  beforeCreate () {
+    registerModule(OrderModule)
+  },
   data () {
     return {
       supported: false,
-      country: rootStore.state.checkout.shippingDetails.country ? rootStore.state.checkout.shippingDetails.country : storeView.tax.defaultCountry,
+      country: rootStore.state.checkout.shippingDetails.country ? rootStore.state.checkout.shippingDetails.country : currentStoreView().tax.defaultCountry,
       paymentMethods: [
         {
           supportedMethods: ['basic-card'],
@@ -50,7 +55,7 @@ export default {
         bucket.push({
           label: product.name,
           amount: {
-            currency: storeView.i18n.currencyCode,
+            currency: currentStoreView().i18n.currencyCode,
             value: this.getProductPrice(product)
           }
         })
@@ -61,7 +66,7 @@ export default {
         if (this.selectedShippingOption.length > 0) {
           bucket.push({
             label: i18n.t('Shipping'),
-            amount: { currency: storeView.i18n.currencyCode, value: this.selectedShippingOption[0].amount.value }
+            amount: { currency: currentStoreView().i18n.currencyCode, value: this.selectedShippingOption[0].amount.value }
           })
         }
 
@@ -69,13 +74,11 @@ export default {
       }
 
       // If synchronization is eanbled get shipping and discount values from Magento
-      const shipping = this.platformTotal.filter(segment => {
-        return segment.code === 'shipping'
-      })
+      const shipping = this.platformTotal.filter(segment => segment.code === 'shipping' && segment.value)
       if (shipping.length > 0) {
         bucket.push({
           label: shipping[0].title,
-          amount: { currency: storeView.i18n.currencyCode, value: shipping[0].value }
+          amount: { currency: currentStoreView().i18n.currencyCode, value: shipping[0].value }
         })
       }
 
@@ -92,7 +95,7 @@ export default {
         let subtotal = 0
 
         this.$store.state.cart.cartItems.forEach(product => {
-          subtotal += parseFloat(product.priceInclTax)
+          subtotal += parseFloat(product.price_incl_tax)
         })
 
         if (this.selectedShippingOption.length > 0) {
@@ -101,7 +104,7 @@ export default {
 
         return {
           label: i18n.t('Grand total'),
-          amount: { currency: storeView.i18n.currencyCode, value: subtotal }
+          amount: { currency: currentStoreView().i18n.currencyCode, value: subtotal }
         }
       }
 
@@ -112,7 +115,7 @@ export default {
       if (total.length > 0) {
         return {
           label: total[0].title,
-          amount: { currency: storeView.i18n.currencyCode, value: total[0].value }
+          amount: { currency: currentStoreView().i18n.currencyCode, value: total[0].value }
         }
       }
 
@@ -137,18 +140,19 @@ export default {
         .show()
         .then(response => {
           // TODO handle payment
-          this.$store.dispatch('order/placeOrder', this.createOrder(response), {root: true}).then(result => {
+          this.$store.dispatch('order/placeOrder', this.createOrder(response), { root: true }).then(result => {
             if (!result.resultCode || result.resultCode === 200) {
               response.complete()
               this.$store.dispatch('checkout/setThankYouPage', true)
               this.$store.commit('ui/setMicrocart', false)
               this.$router.push(this.localizedRoute('/checkout'))
-              this.$store.dispatch('cart/clear', { recreateAndSyncCart: true }, {root: true})
+              // clear cart without sync, because after order cart will be already cleared on backend
+              this.$store.dispatch('cart/clear', { sync: false }, { root: true })
             }
           })
         })
         .catch(e => {
-          console.log(e)
+          Logger.log(e)()
         })
     },
     shippingOptionChange (event) {
@@ -174,7 +178,7 @@ export default {
             total: this.total
           })
         }).catch(e => {
-          console.error(e)
+          Logger.error(e)()
           reject(e)
         })
       })
@@ -204,7 +208,7 @@ export default {
               total: this.total
             })
           }).catch(e => {
-            console.error(e)
+            Logger.error(e)()
             reject(e)
           })
       })
@@ -217,21 +221,21 @@ export default {
           country_id: this.country
         }, { forceServerSync: true }).then(() => {
           this.shippingOptions = []
-          this.$store.state.shipping.methods.forEach(method => {
+          this.$store.getters['checkout/getShippingMethods'].forEach(method => {
             this.shippingOptions.push({
               id: method.method_code,
               carrier_code: method.carrier_code,
               label: method.method_title,
-              selected: setDefault ? this.$store.state.shipping.methods[0].method_code === method.method_code : false,
+              selected: setDefault ? this.$store.getters['checkout/getShippingMethods'][0].method_code === method.method_code : false,
               amount: {
-                currency: storeView.i18n.currencyCode,
+                currency: currentStoreView().i18n.currencyCode,
                 value: method.price_incl_tax
               }
             })
           })
           resolve()
         }).catch(e => {
-          console.error(e)
+          Logger.error(e)()
           reject(e)
         })
       })
@@ -259,7 +263,7 @@ export default {
             region_id: 0,
             country_id: paymentResponse.shippingAddress.country,
             street: [paymentResponse.shippingAddress.addressLine[0], paymentResponse.shippingAddress.addressLine[1]],
-            company: paymentResponse.shippingAddress.organization ? paymentResponse.shippingAddress.organization : 'NA',
+            company: paymentResponse.shippingAddress.organization ? paymentResponse.shippingAddress.organization : '',
             telephone: paymentResponse.shippingAddress.phone,
             postcode: paymentResponse.shippingAddress.postalCode,
             city: paymentResponse.shippingAddress.city,
@@ -273,7 +277,7 @@ export default {
             region_id: 0,
             country_id: paymentResponse.shippingAddress.country,
             street: [paymentResponse.shippingAddress.addressLine[0], paymentResponse.shippingAddress.addressLine[1]],
-            company: paymentResponse.shippingAddress.organization ? paymentResponse.shippingAddress.organization : 'NA',
+            company: paymentResponse.shippingAddress.organization ? paymentResponse.shippingAddress.organization : '',
             telephone: paymentResponse.payerPhone,
             postcode: paymentResponse.shippingAddress.postalCode,
             city: paymentResponse.shippingAddress.city,
@@ -292,7 +296,7 @@ export default {
     },
     getProductPrice (product) {
       if (!config.cart.displayItemDiscounts) {
-        return product.qty * product.priceInclTax
+        return product.qty * product.price_incl_tax
       }
 
       if (product.totals) {

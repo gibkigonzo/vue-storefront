@@ -32,9 +32,11 @@ module.exports = {
     '^.+\\.(css|less)$': '<rootDir>/test/unit/cssStub.js'
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!lodash)'
+    '(.*)storefront-query-builder/node_modules/(.*)',
+    '<rootDir>/node_modules/(?!lodash)',
+    '<rootDir>/node_modules/(?!lodash-es/.*)'
   ],
   setupFiles: [
-    '<rootDir>/test/unit/setupTestEnvironment.js'
+    '<rootDir>/test/unit/setupTestEnvironment.ts'
   ]
 }

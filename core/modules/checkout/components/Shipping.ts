@@ -12,10 +12,12 @@ export const Shipping = {
     }
   },
   beforeDestroy () {
+    this.$bus.$off('checkout-after-load', this.onCheckoutLoad)
     this.$bus.$off('checkout-after-personalDetails', this.onAfterPersonalDetails)
     this.$bus.$off('checkout-after-shippingset', this.onAfterShippingSet)
   },
   beforeMount () {
+    this.$bus.$on('checkout-after-load', this.onCheckoutLoad)
     this.$bus.$on('checkout-after-personalDetails', this.onAfterPersonalDetails)
     this.$bus.$on('checkout-after-shippingset', this.onAfterShippingSet)
   },
@@ -42,13 +44,13 @@ export const Shipping = {
       currentUser: (state: RootState) => state.user.current
     }),
     ...mapGetters({
-      shippingMethods: 'shipping/shippingMethods'
+      shippingMethods: 'checkout/getShippingMethods'
     }),
     checkoutShippingDetails () {
       return this.$store.state.checkout.shippingDetails
     },
     paymentMethod () {
-      return this.$store.state.payment.methods
+      return this.$store.getters['checkout/getPaymentMethods']
     }
   },
   watch: {
@@ -60,14 +62,19 @@ export const Shipping = {
     shipToMyAddress: {
       handler () {
         this.useMyAddress()
-      }
+      },
+      immediate: true
     }
   },
   mounted () {
+    this.checkDefaultShippingAddress()
     this.checkDefaultShippingMethod()
     this.changeShippingMethod()
   },
   methods: {
+    checkDefaultShippingAddress () {
+      this.shipToMyAddress = this.hasShippingDetails()
+    },
     checkDefaultShippingMethod () {
       if (!this.shipping.shippingMethod || this.notInMethods(this.shipping.shippingMethod)) {
         let shipping = this.shippingMethods.find(item => item.default)
@@ -114,7 +121,7 @@ export const Shipping = {
     },
     useMyAddress () {
       if (this.shipToMyAddress) {
-        this.shipping = {
+        this.$set(this, 'shipping', {
           firstName: this.myAddressDetails.firstname,
           lastName: this.myAddressDetails.lastname,
           country: this.myAddressDetails.country_id,
@@ -126,9 +133,9 @@ export const Shipping = {
           phoneNumber: this.myAddressDetails.telephone,
           shippingMethod: this.checkoutShippingDetails.shippingMethod,
           shippingCarrier: this.checkoutShippingDetails.shippingCarrier
-        }
+        })
       } else {
-        this.shipping = this.checkoutShippingDetails
+        this.$set(this, 'shipping', this.checkoutShippingDetails)
       }
       this.changeCountry()
     },
@@ -165,7 +172,7 @@ export const Shipping = {
     changeShippingMethod () {
       let currentShippingMethod = this.getCurrentShippingMethod()
       if (currentShippingMethod) {
-        this.shipping = Object.assign(this.shipping, {shippingCarrier: currentShippingMethod.carrier_code})
+        this.shipping = Object.assign(this.shipping, { shippingCarrier: currentShippingMethod.carrier_code })
         this.$bus.$emit('checkout-after-shippingMethodChanged', {
           country: this.shipping.country,
           method_code: currentShippingMethod.method_code,
@@ -180,6 +187,9 @@ export const Shipping = {
         return false
       }
       return true
+    },
+    onCheckoutLoad () {
+      this.shipping = this.$store.state.checkout.shippingDetails
     }
   }
 }

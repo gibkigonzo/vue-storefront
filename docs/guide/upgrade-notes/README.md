@@ -2,8 +2,175 @@
 
 We're trying to keep the upgrade process as easy as possible. Unfortunately, sometimes manual code changes are required. Before pulling out the latest version, please take a look at the upgrade notes below:
 
+## 1.11 -> 1.12
+
+Most of the changes added to 1.12 are backward compatible. To enable the new features (mostly the optimization features) please follow the steps described below.
+
+**Remove bodybuilder and compact API responses**
+
+The new search adapter `api-search-query` has been added. When you switch to it, by setting the `config.server.api = "api-search-query"` the ElasticSearch query is being built in the [`vue-storefront-api`](https://github.com/DivanteLtd/vue-storefront-api/pull/390) which saves around 400kB in the bundle size as `bodybuilder` is no longer needed in the frontend.
+
+This new `api-search-query` adapter supports the `response_format` query parameter which now is sent to the `/api/catalog` endpoint. Currently there is just one additional format supported: `response_format=compact`. When used, the response format got optimized by: a) remapping the results, removing the `_source` from the `hits.hits`; b) compressing the JSON fields names according to the `config.products.fieldsToCompact`; c) removing the JSON fields from the `product.configurable_children` when their values === parent product values; overall response size reduced over -70%.
+
+**Re-enable amp-renderer**
+
+The `amp-renderer` module has been disabled by default to save the bundle size; If you'd like to enable it uncomment the module from the `src/modules` and uncomment the `product-amp` and `category-amp` links that are added to the `<head>` section in the `src/themes/default/Product.vue` and `src/themes/default/Category.vue`
+
+**Check entity optimization settings**
+
+Cart optimization was earlier disabled automatically if entity optimization was disabled. Now they can be used independently from each other. If you don't want to use cart optimization, make sure that the `entities.optimizeShoppingCart` configuration entry is disabled explicitly.
+
+**deprecated actions and helpers**
+
+Product module has been refactored, here is list of actions that are not used anymore and you can remove them to reduce bundle.
+
+- deprecated actions:
+  - product/reset
+  - product/setupBreadcrumbs
+  - product/syncPlatformPricesOver
+  - product/setupAssociated
+  - product/loadConfigurableAttributes
+  - product/setupVariants
+  - product/filterUnavailableVariants
+  - product/list
+  - product/preConfigureAssociated
+  - product/preConfigureProduct
+  - product/configureLoadedProducts
+  - product/configureBundleAsync
+  - product/configureGroupedAsync
+  - product/configure
+  - product/setCurrentOption
+  - product/setCurrentErrors
+  - product/setOriginal
+  - product/loadProductAttributes
+  - category/list (new action is category-next/fetchMenuCategories)
+
+- deprecated helpers:
+  - configureProductAsync
+  - populateProductConfigurationAsync
+  - setConfigurableProductOptionsAsync
+
+Here is list of actions that are used from 1.12 in product module:
+- product/doPlatformPricesSync
+- product/single
+- product/checkConfigurableParent
+- product/findProducts
+- product/findConfigurableParent
+- product/setCustomOptions
+- product/setBundleOptions
+- product/setCurrent
+- product/loadProduct
+- product/addCustomOptionValidator
+- product/setProductGallery
+- product/loadProductBreadcrumbs
+- product/getProductVariant
+
+All of those actions and helpers that are deprecated, can be removed so you will have smaller bundle.
+Comment those lines:
+- core/modules/catalog/store/product/actions.ts:318
+- core/modules/catalog/helpers/index.ts:14-18
+- core/modules/catalog-next/store/category/actions.ts:265
+
+## 1.10 -> 1.11
+
+This is the last major release of Vue Storefront 1.x before 2.0 therefore more manual updates are required to keep external packages compatible with 1.x as long as possible.
+- `src/modules/index.ts` was renamed to `client.ts`, exported property was renamed to `registerClientModules`
+- Output compression module has been added; it's enabled by default on production builds; to disable it please switch the `src/modules/server.ts` configuration
+- The [`formatCategoryLink`](https://github.com/DivanteLtd/vue-storefront/blob/develop/core/modules/url/helpers/index.ts) now supports multistore - adding the `storeCode` when necessary; it could have caused double store prefixes like `/de/de` - but probably only in the Breadcrumbs (#3359)
+- All modules were refactored to new API. You can still register modules in previous format until 2.0
+- `DroppointShipping` and `magento-2-cms `modules were deleted
+- example modules moved to https://github.com/DivanteLtd/vsf-samples
+- `core/helpers/initCacheStorage.ts` merged with `StorageManager.ts` (import path alias for backward compatibility added)
+- Old extensions mechanism (before VS 1.4) was finally removed after being deprecated for almost a year (`src/extensions` removal)
+- Cache collections were reorganized. In most cases Local Storage keys remained untouched, only collection keys were unified. also they're used only in the core. Posting changes in case someone is using those collections in their modules;
+  - `syncTaskCollection` renamed to `syncTasks`
+  - `compareCollection` renamed to `compare`
+  - `cmsData` renamed to `cms`
+  - `cartsCollection` renamed to `carts`
+  - `checkoutFieldValues`, `checkoutFieldsCollection` renamed to `checkout` (`checkoutFieldsCollection` wasn’t used)
+  - `ordersCollection` and `orders` renamed to just `orders` (`ordersCollection` wasn’t used)
+  - `elasticCacheCollection` renamed to `elasticCache`
+  - `usersCollection` `usersData` merged and renamed to `user`
+  - `attributesCollection`, `attributes` renamed to just `attributes`
+  - `ordersHistoryCollection` merged to `user` cache where it belongs
+  - `categoriesCollection` renamed to categories
+  - Collections in theme like `claimsCollection` (claims modules) remained untouched
+- `UserOrder` component has been renamed to `UserOrderHistory` and moved from `src/modules/order-history/components/UserOrders` to `@vue-storefront/core/modules/order/components/UserOrdersHistory`. This component was used in `MyOrders` component found here: `src/themes/default/components/core/blocks/MyAccount/MyOrders.vue`. In this file the `import` path has to be updated.
+- `claims`, `promoted-offers`, `homepage` and `ui` modules have been moved from `@vue-storefront/src/modules` to `src/themes/default/store/` and reduced to stores only.<br>
+Delete those folders:<br>
+  -- `src/modules/claims`<br>
+  -- `src/modules/promoted-offers`<br>
+  -- `src/modules/homepage`<br>
+  -- `src/modules/ui-store`<br>
+Copy folder `theme/store/` from `theme default`.<br>
+Register the stores copied in previous step in `src/themes/default/index.js`. To do that, import them along with `StorageManager` method, used to replace `claims beforeRegistration hook`.
+```js
+import { StorageManager } from '@vue-storefront/core/lib/storage-manager';
+import { store as claimsStore } from 'theme/store/claims'
+import { store as homeStore } from 'theme/store/homepage'
+import { store as uiStore } from 'theme/store/ui'
+import { store as promotedStore } from 'theme/store/promoted-offers'
+```
+Next, inside `initTheme` method use `store.registerModule` method to register the stores.
+```js
+StorageManager.init('claims');
+store.registerModule('claims', claimsStore);
+store.registerModule('homepage', homeStore);
+store.registerModule('ui', uiStore);
+store.registerModule('promoted', promotedStore);
+```
+- `WebShare` moved from `@vue-storefront/core/modules/social-share/components/WebShare.vue` to `@vue-storefront/src/themes/default/components/theme/WebShare.vue`. This component was used in `Product` component found here: `src/themes/default/pages/Product.vue`. In this file the `import` path has to be updated.
+
+- We've fixed the naming strategy for product prices; The following fields were renamed: `special_priceInclTax` -> `special_price_incl_tax`, `priceInclTax` -> `price_incl_tax`, `priceTax` -> `price_tax`; The names have been kept and marked as @deprecated. These fields will be **removed with Vue Storefront 2.0rc-1**.
+- We've decreased the `localStorage` quota usage + error handling by introducing new config variables:
+- `config.products.disablePersistentProductsCache` to not store products by SKU (by default it's on). Products are cached in ServiceWorker cache anyway so the `product/list` will populate the in-memory cache (`cache.setItem(..., memoryOnly = true)`);
+- `config.seo.disableUrlRoutesPersistentCache` - to not store the url mappings; they're stored in in-memory cache anyway so no additional requests will be made to the backend for url mapping; however it might cause some issues with url routing in the offline mode (when the offline mode PWA installed on homescreen got reloaded, the in-memory cache will be cleared so there won't potentially be the url mappings; however the same like with `product/list` the ServiceWorker cache SHOULD populate url mappings anyway);
+- `config.syncTasks.disablePersistentTaskQueue` to not store the network requests queue in service worker. Currently only the stock-check and user-data changes were using this queue. The only downside it introduces can be related to the offline mode and these tasks will not be re-executed after connectivity established, but just in a case when the page got reloaded while offline (yeah it might happen using ServiceWorker; `syncTasks` can't be re-populated in cache from SW)
+- We've moved files from /store/lib to /lib. Basically to use it from the new directory you have to import now from `@vue-storefront/core/lib/store/` instead of `@vue-storefront/core/store/lib/`. These core files got changed:
+```js
+core/build/webpack.base.config.ts
+core/lib/sync/task.ts
+core/lib/storage-manager.ts
+core/modules/catalog/helpers/search.ts
+core/modules/catalog/store/attribute/mutations.ts
+core/modules/catalog/store/category/actions.ts
+core/modules/catalog/store/category/mutations.ts
+core/modules/catalog/store/product/actions.ts
+core/modules/catalog/store/tax/mutations.ts
+core/modules/compare/store/actions.ts
+core/modules/order/store/mutations.ts
+core/modules/order/index.ts
+core/modules/wishlist/store/actions.ts
+```
+If by some reasons you wan't to have the `localStorage` back on for `Products by SKU`, `Url Routes` and `SyncTasks` - please just set these variables back to `false` in your `config/local.json`.
+
+- New page-not-found handling requires to update router/index.js in the theme.
+- The option `config.ssr.lazyHydrateFor` with `category-next.products` value was introduced which is responsible for hydrating products list and loading them only on client side. It means there is no category products in the `__INITIAL__STATE__`. It's enabled by default.
+- The modules: `Review`, `Mailer`, `Order`, `RecentlyViewed`, `InstantCheckout` are no longer loaded by default in the main bundle as they are loading on-demand on the related pages.
+- Authentication guard was moved from user module router to `MyAccount` pages mixin.
+- The getters `cmsBlocks`, `cmsBlockIdentifier`, `cmsBlockId` are deprecated. Please use `getCmsBlocks`, `getCmsBlockIdentifier`, `getCmsBlockId` instead.
+- Translations for "Order #", "Price ", "Select size ", "You are logged in as" and "items" changed, they now include a placeholder for the value. Please refer to [this commit](https://github.com/DivanteLtd/vue-storefront/pull/3550/commits/366d31bf28a1e27a7f14b222369cba8fe0a6d3e0) in order to adjust them, otherwise they might get lost.
+- `i18n.currencySignPlacement` config value is replaced by `i18n.priceFormat` so price format becomes more flexible
+- Theme initialization needs to be modified in customized themes
+  - Delete the line `RouterManager.addRoutes(routes, router, true)`. This is now handled in `setupMultistoreRoutes`, including the default store.
+  - Optionally give theme routes priority, to ensure they override module routes if there are any conflicts. For example `setupMultistoreRoutes(config, router, routes, 10)`.
+  - See `/src/themes/default/index.js` for a complete example.
+- In `storeView` config there is no more `disabled` flag for specific language config. Links for other languages will be displayed if specific `storeView` config exist.
+- Categories can be filtered globally, to never be loaded, by setting `entities.category.filterFields` in local.json, e.g. `"filterFields": { "is_active": true }`.
+- Categories can be filtered in the Breadcrumbs, by setting `entities.category.breadcrumbFilterFields` in local.json, e.g. `"breadcrumbFilterFields": { "include_in_menu": true }`.
+## 1.10 -> 1.10.4
+
+We've decreased the `localStorage` quota usage + error handling by introducing new config variables:
+
+- `config.products.disablePersistentProductsCache` to not store products by SKU (by default it's on). Products are cached in ServiceWorker cache anyway so the `product/list` will populate the in-memory cache (`cache.setItem(..., memoryOnly = true)`);
+- `config.seo.disableUrlRoutesPersistentCache` - to not store the url mappings; they're stored in in-memory cache anyway so no additional requests will be made to the backend for url mapping; however it might cause some issues with url routing in the offline mode (when the offline mode PWA installed on homescreen got reloaded, the in-memory cache will be cleared so there won't potentially be the url mappings; however the same like with `product/list` the ServiceWorker cache SHOULD populate url mappings anyway);
+- `config.syncTasks.disablePersistentTaskQueue` to not store the network requests queue in service worker. Currently only the stock-check and user-data changes were using this queue. The only downside it introuces can be related to the offline mode and these tasks will not be re-executed after connectivity established, but just in a case when the page got reloaded while offline (yeah it might happen using ServiceWorker; `syncTasks` can't be re-populated in cache from SW)
+
+If by some reasons you wan't to have the `localStorage` back on for `Products by SKU`, `Url Routes` and `SyncTasks` - please juset set these variables back to `false` in your `config/local.json`.
+
+
 ## 1.9 -> 1.10
-- Event `application-after-init` is now emitted by event bus instead of root Vue instance (app), so you need to listen to `Vue.prototype.$bus` (`Vue.prototype.$bus.$on()`) now
+- Event `application-after-init` is now emitted by event bus instead of root Vue instance (app), so you need to listen to `Vue.prototype.$bus` (`EventBus.$on()`) now
 - The lowest supported node version  is currently 8.10.0,
 - Module Mailchimp is removed in favor of Newsletter. `local.json` configuration under key `mailchimp` moved to key `newsletter`.
 - In multistore mode now there is a possibility to skip appending storecode to url with `appendStoreCode` config option. To keep the original behavior, it should be set to true. - @lukeromanowicz (#3048).
@@ -20,7 +187,7 @@ We're trying to keep the upgrade process as easy as possible. Unfortunately, som
 - The getter `cart/totalQuantity` has been replaced with `cart/getItemsTotalQuantity` - @pkarw (#2522)
 
 ## 1.8 -> 1.9
-- The Url Dispatcher feature added for friendly URLs. When `config.seo.useUrlDispatcher` set to true the `product.url_path` and `category.url_path` fields are used as absolute URL addresses (no `/c` and `/p` prefixes anymore). Check the latest `mage2vuestorefront` snapshot and **reimport Your products** to properly set `url_path` fields 
+- The Url Dispatcher feature added for friendly URLs. When `config.seo.useUrlDispatcher` set to true the `product.url_path` and `category.url_path` fields are used as absolute URL addresses (no `/c` and `/p` prefixes anymore). Check the latest `mage2vuestorefront` snapshot and **reimport Your products** to properly set `url_path` fields
 - `cart.multisiteCommonCart` config property changed to `storeViews.commonCache`
 - Way of creating VS Modules was changed to use factory method instead of explict object creation. Even though the feature is backward compatible we highly encourage all developers to refactor their modules to use new syntax.
 
@@ -28,8 +195,8 @@ The process of creating a new module with the factory method looks like the foll
 ````js
 import { createModule } from '@vue-storefront/core/lib/module'
 
-const moduleConfig: VueStorefrontModuleConfig = { 
-  // VS module config 
+const moduleConfig: VueStorefrontModuleConfig = {
+  // VS module config
 }
 
 const module = createModule(moduleConfig)
@@ -41,7 +208,7 @@ const module = createModule(moduleConfig)
 - Added validation for UTF8 alpha and alphanumeric characters in most checkout fields
 - Update your local.json config and set default `api.url` path, without it you may have problems with elasticsearch queries.
 
-### Troubleshooting 
+### Troubleshooting
 - In case of CORS problem after upgrade check your elasticsearch url in config file. Best practice for that change can be found [here](https://github.com/DivanteLtd/vue-storefront/commit/77fc9c2765068303879c75ef9ed4a4b98f6763b6)
 
 - In case of app crashing, especially when opening `vue devtools` in browser, try setting `storeViews.commonCache` to `false`.
@@ -64,14 +231,14 @@ Full changelog is available [here](https://github.com/DivanteLtd/vue-storefront/
 Starting from Vue Storefront 1.7, we changed the caching strategy and offline-ready features:
 - By default, the Elasticsearch Queries are executed using `GET` method and therefore are cached by Service Worker (`config.elasticsearch.queryMethod` — set it to POST for the previous behavior and if you're using graphql).
 - By default, products and queries cache is set in `LocalStorage` with a quota set to 4MB (`config.server.elasticCacheQuota`). If the storage quota is set, the cache purging is executed every 30 seconds using the LRU algorithm. Local Storage is limited to 5MB in most browsers.
-- We added `config.server. disableLocalStorageQueriesCache`, which is set to `true` by default. When this option is on, we're not storing the Elasticsearch results in the local cache because results are by default cached in the Service Worker cache anyway.
+- We added `config.server. disablePersistentQueriesCache`, which is set to `true` by default. When this option is on, we're not storing the Elasticsearch results in the local cache because results are by default cached in the Service Worker cache anyway.
 - `module.extend` has been changed to `extendModule`. You can find usage examples in `src/modules/index.ts`.
 - [routes](https://github.com/patzick/vue-storefront/commit/a97eb11868de2915e86d57c4279caf944d4de422#diff-a334a7caeb7f61836f8c1178d92de3e0), [layouts](https://github.com/patzick/vue-storefront/commit/a97eb11868de2915e86d57c4279caf944d4de422#diff-48863b9fe31d7713222ec5709ef5a4fa), and component, which are not visible at page rendering are now loaded when they are needed.
 - Every store manipulation should be done by dispatching actions. Invoke store dispatch on `category/mergeSearchOptions` when manipulating `store.state.category.current_product_query` somewhere.
 - [here](https://github.com/patzick/vue-storefront/commit/a97eb11868de2915e86d57c4279caf944d4de422) are all changes in default themes
 
 Backward compatibility: To reverse to the 1.0–1.6 behavior:
-- Set `config.server.disableLocalStorageQueriesCache` = `false`,
+- Set `config.server.disablePersistentQueriesCache` = `false`,
 - Set `config.elasticsearch.queryMethod` = `POST`
 - Set `config.localForage.defaultDrivers.elasticCache` = `INDEXEDDB`
 
@@ -109,7 +276,7 @@ this.$store.dispatch('notification/spawnNotification',
 ````
 Change every store:
 ````js
-Vue.prototype.$bus.$emit('notification',
+EventBus.$emit('notification',
 ````
 to:
 ````js
@@ -260,7 +427,7 @@ We added Reviews support, however, Magento 2 is still lacking Reviews support in
    - **removeCoupon** -> **clearCoupon** - removing coupon by dispatch removeCoupon API method and toggle coupon form
    - **applyCoupon** -> **setCoupon** - submit coupon form by dispatch applyCoupon API method
    - **enterCoupon** - was removed, because @keyup="enterCoupon" we changed to @keyup.enter="setCoupon"
-   
+
 3. We moved $emit with notification about appliedCoupon and removedCoupon from Vuex store to the default theme. Now applyCoupon and removeCoupon returns promise, which you can handle by yourself.
 
 4. We moved VueOfflineMixin and onEscapePress mixins to the theme component. The core component is clean from UI stuff now.
@@ -334,7 +501,7 @@ Now it mirrors `core/` folder structure, which is desired behaviour.
 
 We added the possibility to run the `vue-storefront-api` fully in Docker (previously, just the Elastic and Redis images were present in the `docker-compose.yml`. Please read the [README.md](https://github.com/DivanteLtd/vue-storefront-api) for more details.
 
-**PLEASE NOTE:** We changed the structure of the `elasticsearch` section of the config files, moving `esIndexes` to `elasticsearch.indices` etc. There is an automatic migration that will update your config files automatically by running: `npm run migrate` in the `vue-storefront-api` folder.
+**PLEASE NOTE:** We changed the structure of the `elasticsearch` section of the config files, moving `esIndexes` to `elasticsearch.indices` etc. There is an automatic migration that will update your config files automatically by running: `yarn migrate` in the `vue-storefront-api` folder.
 
 ### Default storage of the shopping carts and user data moved to localStorage
 
@@ -380,7 +547,7 @@ export default {
 </script>
 ```
 
-4. We've added Multistore support. It shouldn't imply any breaking changes to the existing themes / extensions (by default it's just disabled). 
+4. We've added Multistore support. It shouldn't imply any breaking changes to the existing themes / extensions (by default it's just disabled).
 
 ## 1.0RC-2 -> 1.0RC-3 ([release notes](https://github.com/DivanteLtd/vue-storefront/releases/tag/v1.0.0-rc.3))
 
@@ -420,11 +587,11 @@ The endpoints are also set by the `yarn installer` so You can try to reinstall V
         "includeFields": [ "attribute_code", "id", "entity_type_id", "options", "default_value", "is_user_defined", "frontend_label", "attribute_id", "default_frontend_label", "is_visible_on_front", "is_visible", "is_comparable" ]
       },
       "productList": {
-        "includeFields": [ "type_id", "sku", "name", "price", "priceInclTax", "originalPriceInclTax", "id", "image", "sale", "new" ],
+        "includeFields": [ "type_id", "sku", "name", "price", "priceInclTax", "original_price_incl_tax", "id", "image", "sale", "new" ],
         "excludeFields": [ "configurable_children", "description", "configurable_options", "sgn", "tax_class_id" ]
       },
       "productListWithChildren": {
-        "includeFields": [ "type_id", "sku", "name", "price", "priceInclTax", "originalPriceInclTax", "id", "image", "sale", "new", "configurable_children.image", "configurable_children.sku", "configurable_children.price", "configurable_children.special_price", "configurable_children.priceInclTax", "configurable_children.specialPriceInclTax", "configurable_children.originalPrice", "configurable_children.originalPriceInclTax", "configurable_children.color", "configurable_children.size" ],
+        "includeFields": [ "type_id", "sku", "name", "price", "priceInclTax", "original_price_incl_tax", "id", "image", "sale", "new", "configurable_children.image", "configurable_children.sku", "configurable_children.price", "configurable_children.special_price", "configurable_children.price_incl_tax", "configurable_children.special_price_incl_tax", "configurable_children.original_price", "configurable_children.original_price_incl_tax", "configurable_children.color", "configurable_children.size" ],
         "excludeFields": [ "description", "sgn", "tax_class_id" ]
       },
       "product": {

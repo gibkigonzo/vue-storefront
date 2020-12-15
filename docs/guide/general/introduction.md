@@ -86,7 +86,7 @@ The mechanism of injecting core business logic into themes is ridiculously simpl
 
 So assume we have a core Microcart component with business logic as above (left side), we can easily inject it into any of our theme components (right side) just by importing it and adding as a mixin `mixins: [Microcart]`. This is all you need to make use of core business logic inside your theme. With this approach, we can easily ship updates to all core components without breaking your shop.
 
-The easiest way to create your own theme is to create a copy of the default one, change its name in its `package.json` file, change the active theme in `config/local.json` and run `yarn` to make [Lerna](https://github.com/lerna/lerna) linking (which we use for monorepos).
+[Check how to create theme based on our official themes](https://docs.vuestorefront.io/guide/installation/theme.html).
 
 ## Offline mode and cache
 Vue Storefront still works even while the user is offline.
@@ -95,13 +95,13 @@ We managed to do this by making extensive use of the browser cache. 
 - **For the static assets** (only prod) we use the [sw-precache](https://github.com/GoogleChromeLabs/sw-precache) plugin (config can be found in `core/build/webpack.prod.sw.config.js` ). They are cached in Service Worker and can be inspected under the `Application/Cache Storage` tab of your Developer Tools.
 
 ![cache](https://cdn-images-1.medium.com/max/1200/1*BHVzt7oCIxcM3bNPZriKmw.png)
-*Here you can find cached static assets. Please notice that Service Worker works only in production mode.*
+*Here you can find cached static assets.*
 
 :::warning
 Please note that Service Worker works only in production mode.
 :::
 
-- **For the catalog and store-data cache** we use IndexedDB and Local Storage. We also prefetch products from visited categories so once you enter one, all of its products are available offline. The mechanism of offline storage is located under `core/lin./storage`.
+- **For the catalog and store-data cache** we use IndexedDB and Local Storage. We also prefetch products from visited categories so once you enter one, all of its products are available offline. The mechanism of offline storage is located under `core/lib/store/`.
 
 We use some of the cached data even while the user is online to display the content instantly. This explains why Vue Storefront is lightning fast.
 
@@ -112,11 +112,11 @@ You may not believe me but this is all you need to know to start working with Vu
 ## Useful Links
 
 - [Documentation](https://docs.vuestorefront.io/)
-- [Community slack invitation link](https://join.slack.com/t/vuestorefront/shared_invite/enQtMzA4MTM2NTE5NjM2LTI1M2RmOWIyOTk0MzFlMDU3YzJlYzcyYzNiNjUyZWJiMTZjZjc3MjRlYmE5ZWQ1YWRhNTQyM2ZjN2ZkMzZlNTg)
+- [Community slack invitation link](https://join.slack.com/t/vuestorefront/shared_invite/enQtOTUwNjQyNjY5MDI0LWFmYzE4NTYxNDBhZDRlMjM5MDUzY2RiMjU0YTRjYWQ3YzdkY2YzZjZhZDZmMDUwMWQyOWRmZjQ3NDgwZGQ3NTk)
 - [Project structure explained](https://docs.vuestorefront.io/guide/basics/project-structure.html)
 - [Configuration file explained](https://docs.vuestorefront.io/guide/basics/configuration.html)
 - [Extending Vue Storefront](https://docs.vuestorefront.io/guide/extensions/introduction.html)
-- [How to contribute](https://docs.vuestorefront.io/guide/basics/contributing.html#branches)
+- [How to contribute](https://docs.vuestorefront.io/guide/basics/contributing.html#how-to-contribute)
 
 ## Video with training
 You can also watch a video recording from 4th Vue Storefront hackathon with free introduction training

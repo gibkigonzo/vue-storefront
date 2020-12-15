@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import toString from 'lodash-es/toString'
 import config from 'config'
-
 import i18n from '@vue-storefront/i18n'
 import store from '@vue-storefront/core/store'
 import EventBus from '@vue-storefront/core/compatibility/plugins/event-bus'
@@ -28,11 +27,12 @@ export default {
   },
   computed: {
     ...mapGetters('category', ['getCurrentCategory', 'getCurrentCategoryProductQuery', 'getAllCategoryFilters', 'getCategoryBreadcrumbs', 'getCurrentCategoryPath']),
+    ...mapGetters('tax', ['getIsUserGroupedTaxActive']),
     products () {
-      return this.$store.state.product.list.items
+      return this.$store.getters['product/list']
     },
     productsCounter () {
-      return this.$store.state.product.list.items ? this.$store.state.product.list.items.length : 0
+      return this.products ? this.products.length : 0
     },
     productsTotal () {
       return this.$store.state.product.list.total
@@ -41,7 +41,7 @@ export default {
       return this.getCurrentCategoryProductQuery
     },
     isCategoryEmpty () {
-      return (!(this.$store.state.product.list.items) || this.$store.state.product.list.items.length === 0)
+      return (!(this.products) || this.products.length === 0)
     },
     category () {
       return this.getCurrentCategory
@@ -83,10 +83,6 @@ export default {
       const defaultFilters = config.products.defaultFilters
       store.dispatch('category/resetFilters')
       EventBus.$emit('filter-reset')
-      await store.dispatch('attribute/list', { // load filter attributes for this specific category
-        filterValues: defaultFilters, // TODO: assign specific filters/ attribute codes dynamicaly to specific categories
-        includeFields: config.entities.optimize && isServer ? config.entities.attribute.includeFields : null
-      })
       const parentCategory = await store.dispatch('category/single', { key: config.products.useMagentoUrlKeys ? 'url_key' : 'slug', value: route.params.slug })
       let query = store.getters['category/getCurrentCategoryProductQuery']
       if (!query.searchProductQuery) {
@@ -127,7 +123,7 @@ export default {
   beforeMount () {
     this.$bus.$on('filter-changed-category', this.onFilterChanged)
     this.$bus.$on('list-change-sort', this.onSortOrderChanged)
-    if (config.usePriceTiers) {
+    if (config.usePriceTiers || this.getIsUserGroupedTaxActive) {
       this.$bus.$on('user-after-loggedin', this.onUserPricesRefreshed)
       this.$bus.$on('user-after-logout', this.onUserPricesRefreshed)
     }
@@ -135,7 +131,7 @@ export default {
   beforeDestroy () {
     this.$bus.$off('list-change-sort', this.onSortOrderChanged)
     this.$bus.$off('filter-changed-category', this.onFilterChanged)
-    if (config.usePriceTiers) {
+    if (config.usePriceTiers || this.getIsUserGroupedTaxActive) {
       this.$bus.$off('user-after-loggedin', this.onUserPricesRefreshed)
       this.$bus.$off('user-after-logout', this.onUserPricesRefreshed)
     }
@@ -276,7 +272,7 @@ export default {
   metaInfo () {
     const storeView = currentStoreView()
     return {
-      link: [
+      /* link: [
         { rel: 'amphtml',
           href: this.$router.resolve(localizedRoute({
             name: 'category-amp',
@@ -285,7 +281,7 @@ export default {
             }
           }, storeView.storeCode)).href
         }
-      ],
+      ], */
       title: htmlDecode(this.category.meta_title || this.categoryName),
       meta: this.category.meta_description ? [{ vmid: 'description', name: 'description', content: htmlDecode(this.category.meta_description) }] : []
     }

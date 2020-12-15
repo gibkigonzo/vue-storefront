@@ -1,12 +1,593 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - UNRELEASED
+
+### Fixed
+- Fixed some typo in docs (#5071)
+
+## [1.12.2] - 2020.07.28
+
+### Added
+
+- **IMPORTANT** for security reasons we added new config `users.allowModification`.
+  This can help to dissallow modifying fields that shouldn't be changed by user.
+- Add helmet - enabled by default, you can pass configuration by adding `config.server.helmet.config`.
+  More info about helmet configuration https://helmetjs.github.io/docs/
+- Add config `users.tokenInHeader` which allows to send token in header instead in query. Require to set on true same config in vsf-api.
+- Make calculation of bundled products price by options optional - @cewald (#4556)
+
+### Fixed
+
+- remove deprecated value from attributesListQuery query - @gibkigonzo (#4572)
+- Fixed dutch translations - @1070rik (#4587)
+- localForage memory overload fixed. `localForage.preserveCollections` keeps names of collections to be preserved from being cleared. - @prakowski
+- Fixed bug in `restoreQuantity` - getItem never returns cart item - @gibkigonzo (#4619)
+- Separate variant in findProductOption to get parent sku - @gibkigonzo (#4641)
+- Fix wrong value in Cache-Control header for max-age - boehsermoe (#4657)
+
+### Changed / Improved
+
+## [1.12.1] - 2020.06.22
+
+### Added
+
+- Add `purgeConfig` to default.json and purge-config loader - @gibkigonzo (#4540)
+- Load attributes data of attribute-meta for bundled and grouped products - @cewald (#4551)
+- Separate theme installation and add it as yarn init:theme or as a step in yarn installer. - @gibkigonzo (4534, #4552)
+
+### Fixed
+
+- use `config.i18n.defaultLocale` as fallback locale instead of `'en-US'` - @gibkigonzo (#4489)
+- use Math.abs on raw price - @gibkigonzo (#4521)
+- Clears vuex warnings about overriding state by module - @gibkigonzo (#4541)
+
+### Changed / Improved
+
+## [1.12.0] - 2020.06.01
+
+### Added
+
+- Add `vsf-capybara` support as a dependency and extend CLI to support customization - @psmyrek (#4209)
+- Support theme configuration via CLI - @psmyrek (#4395)
+- Allow parent_ids field on product as an alternative to urlpath based breadcrumb navigation (#4219)
+- Pass the original item_id when updating/deleting a cart entry @carlokok (#4218)
+- Separating endpoints for CSR/SSR - @Fifciu (#2861)
+- Added short hands for version and help flags - @jamesgeorge007 (#3946)
+- Add `or` operator for Elasticsearch filters in `quickSearchByQuery` and use exists if value is `null` - @cewald (#3960)
+- Add unified fetch in mappingFallback for all searched entities - @gibkigonzo (#3942)
+- add npm-run-all for parallel build - @gibkigonzo (#3819)
+- Add OutputCaching support for x-vs-store-code - @benjick (#3979)
+- The new search adapter `api-search-query` has been added. When you switch to it, by setting the `config.server.api = "api-search-query"` the ElasticSearch query is being built in the [`vue-storefront-api`](https://github.com/DivanteLtd/vue-storefront-api/pull/390) which saves around 400kB in the bundle size as `bodybuilder` is no longer needed in the frontend - @pkarw - #2167
+- This new `api-search-query` adapter supports the `response_format` query parameter which now is sent to the `/api/catalog` endpoint. Currently there is just one additional format supported: `response_format=compact`. When used, the response format got optimized by: a) remapping the results, removing the `_source` from the `hits.hits`; b) compressing the JSON fields names according to the `config.products.fieldsToCompact`; c) removing the JSON fields from the `product.configurable_children` when their values === parent product values; overall response size reduced over -70% - @pkarw
+- The `amp-renderer` module has been disabled by default to save the bundle size; If you'd like to enable it uncomment the module from the `src/modules` and uncomment the `product-amp` and `category-amp` links that are added to the `<head>` section in the `src/themes/default/Product.vue` and `src/themes/default/Category.vue`
+- Reset Password confirmation page - @Fifciu (#2576)
+- Add `Intl.NumberFormat()`/`toLocaleString()` via polyfill support in NodeJs - @cewald (#3836, #4040)
+- Added `saveBandwidthOverCache` parameter for skipping caching for products data - @andrzejewsky (#3706)
+- New zoom effect for product gallery images - @Michal-Dziedzinski (#2755)
+- Add custom currency separators and amount of fraction digits - @EndPositive (#3553)
+- Product Page Schema implementation as JSON-LD - @Michal-Dziedzinski (#3704)
+- Add `/cache-version.json` route to get current cache version
+- Built-in module for detecting device type based on UserAgent with SSR support - @Fifciu
+- Update to `storefront-query-builder` version `1.0.0` - @cewald (#4234)
+- Move generating files from webpack config to script @gibkigonzo (#4236)
+- Add correct type matching to `getConfigurationMatchLevel` - @cewald (#4241)
+- Support `useSpecificImagePaths` with `useExactUrlsNoProxy` - @cewald (#4243)
+- Adds module which handles cache invalidation for Fastly. - @gibkigonzo (#4096)
+- Add vsf-cache-nginx and vsf-cache-varnish modules - @gibkigonzo (#4096)
+- Added meta info for CMS pages from Magento @mdanilowicz (#4392)
+- Add useful core events to server & logger - @cewald (#4419)
+
+### Fixed
+
+- Fixed `resultPorcessor` typo - @psmyrek
+- Negative price has doubled minus sign - @psmyrek (#4353)
+- Fixed Search product fails for category filter when categoryId is string - @adityasharma7 (#3929)
+- Revert init filters in Vue app - @gibkigonzo (#3929)
+- All categories disappearing if you add the child category name to includeFields - @1070rik (#4015)
+- Fix overlapping text in PersonalDetails component - @jakubmakielkowski (#4024)
+- Redirect from checkout to home with a proper store code - @Fifciu
+- Added back error notification when user selects invalid configuration - @1070rik (#4033)
+- findConfigurableChildAsync - return best match for configurable variant - @gibkigonzo, @cewald (#4042, #4216)
+- use storeCode for mappingFallback url - @gibkigonzo (#4050)
+- `getVariantWithLowestPrice` uses inexistent `final_price` property - @cewald (#4091)
+- Fixed `NOT_ALLOWED_SSR_EXTENSIONS_REGEX` to only match with file extensions having a dot - @haelbichalex (#4100)
+- Fixed problem with not showing error message when placing an order fails - @qiqqq
+- Invoking afterCacheInvalidated server hook in a proper moment - @Fifciu (#4176)
+- Fixed `cart/isVirtualCart` to return `false` when cart is empty - @haelbichalex(#4182)
+- Use `setProductGallery` in `product/setCurrent` to use logic of the action - @cewald (#4153)
+- Use same data format in getConfigurationMatchLevel - @gibkigonzo (#4208)
+- removed possible memory leak in ssr - @resubaka (#4247)
+- Bugfix for reactivity of `current_configuration` in `populateProductConfigurationAsync` - @cewald (#4258)
+- Bugfix for build exception in Node v13.13+ - @cewald (#4249)
+- Convert option ids to string while comparing them in `getProductConfiguration` - @gibkigonzo (#4484)
+- change value to number in price filter - @gibkigonzo (#4478)
+
+### Changed / Improved
+
+- Optimized `translation.processor` to process only enabled locale CSV files - @pkarw (#3950)
+- Remove commit register mapping - @gibkigonzo (#3875)
+- Improved method `findConfigurableChildAsync` - find variant with lowest price - @gibkigonzo (#3939)
+- Removed `product/loadConfigurableAttributes` calls - @andrzejewsky (#3336)
+- Removed unused locales in disabled multistore - @gibkigonzo (#4072)
+- Optimized attributes loading - @andrzejewsky (#3948)
+- Cart optimization can now be used regardless if entity optimization is enabled - @juho-jaakkola (#4198)
+- Improve typescript support for test utils - @resubaka (#4067)
+- Removed `product/loadConfigurableAttributes` calls - @andrzejewsky, @gibkigonzo (#3336)
+- Disable `mapFallback` url by default - @gibkigonzo(#4092)
+- Include token in pricing sync -  @carlokok (#4156)
+- Move 'graphql' search adapter from core to src (deprecated) - @gibkigonzo (#4214)
+- Homepage, new products query, uses now `new` attribute - @mdanilwoicz
+- Refactor product module, more info in upgrade notes- @gibkigonzo (#3952, #4459)
+- Move default theme to separate repository https://github.com/DivanteLtd/vsf-default - @gibkigonzo (#4255)
+- add two numbers after dot to price by default, calculate default price for bundle or grouped main product, update typing, add fallback to attribute options - @gibkigonzo (#4476)
+- udpate yarn and filter shipping methods for instant checkout - @gibkigonzo (#4480)
+- add attribute metadata search query, add parentId - @gibkigonzo (#4491)
+
+## [1.11.4] - 2020.05.26
+
+### Added
+
+
+### Changed / Improved
+
+- use yarn in cli installer - @gibkigonzo (#4292)
+- disable out of stock notification when config.stock.allowOutOfStockInCart is true - @gibigonzo (#4340)
+
+
+### Fixed
+
+- Use LRU as object contructor based on newest changes in module - @gibkigonzo (#4242)
+- Fixed ESC button action (minicart, wishlist) - @mdanilowicz (#4393)
+- Fixes problems related to tax calculation and price filter in multistore setup - @juho-jaakkola (#4376)
+- Blank order details page - @mdanilowicz (#4382)
+- upadate cart hash after sync with backend - @gibkigonzo (#4387)
+- exit from errorHandler after redirection - @gibkigonzo (#4246)
+- add redirection in component for simple product related to configurable product - @gibkigonzo (#4359)
+- disable sending carrier_code or method_code for virtual products,
+  adjust vue-carousel and vuelidate to newest versions api,
+  add aplha validators for register fields - @gibkigonzo (#4455, #4461)
+
+## [1.11.3] - 2020.04.27
+
+### Changed / Improved
+
+- The default config file is now in more human-readable format - @juho-jaakkola (#4197)
+- Create only once aside async component - @gibkigonzo (#4229, #4268)
+
+### Fixed
+- Fixes when having multiple custom options with overlapping option_type_id values, selecting 1 changes the others - @carlokok (#4196)
+- Update eslint and fix code style. - @gibkigonzo (#4179 #4181)
+- Fixes bug that caused addToCart action not to display messages to user - @juho-jaakkola (#4185)
+- add missing cache tags for category and product - @gibkigonzo (#4173)
+- add ssrAppId to avoid second meta render on csr - @gibkigonzo (#4203)
+- take control over default broswer behavior and use saved category page size to load prev products - @gibkigonzo (#4201)
+- update getCurrentCartHash after add/remove coupon - @gibkigonzo (#4220)
+- update replaceNumberToString, so it will change ONLY numbers to string - @gibkigonzo (#4217)
+- allow empty shipping methods in checkout - @gibkigozno (#4192)
+- configure products before price update - this is needed to have variant sku as product sku - @gibkigonzo (#4053)
+- omit stock and totals when creating cart hash, it is not needed to compare products - @gibkigozno (#4235, #4273)
+
+## [1.11.2] - 2020.03.10
+
+### Added
+
+- Add `isBackRoute` that informs if user returns to route, skip loading products for category if he does - @gibkigonzo (#4066)
+- Add server context to async data loader - @gibkigonzo (#4113)
+- Add preload and preconnect for google font - @gibkigonzo (#4121)
+
+### Changed / Improved
+
+- optimizations - improved prefetch strategy - @gibkigonzo (#4080)
+- improvements to Finnish translations - @evktalo (#4116)
+- Radio button now allows separate checked, value and name attributes - @EndPositive (#4098)
+- Update backwards compatible dependencies - @simonmaass (#4126)
+
+### Fixed
+
+- add disconnect and sync options for cart/clear - @gibkigonzo (#4062)
+- add '1' as searched value for 'is_user_defined' and 'is_visible' (createAttributesListQuery) - @gibkigonzo (#4075)
+- Fix possibility to add same SKU with different custom options to the cart - @Michal-Dziedzinski (#3595)
+- Fix `calculateProductTax` to find matching tax rules from ES for current product - @DylannCordel (#4056)
+- Set `totals` in products in cart always in reactive way - @psmyrek (#4079)
+- Fix sync cart between tabs - @Michal-Dziedzinski (#3838)
+- Add currentRoute to url module and return cached requests - @gibkigonzo (#4077, #4066)
+- Hide original radio button behind built label - @EndPositive (#4098)
+- Disable overriding `route` state in **INITIAL_STATE** - @gibkigonzo (#4095)
+- Fix gtm order placement event when user was guest - @Michal-Dziedzinski (#4064)
+- Fix gtm event switched properties - @Michal-Dziedzinski (#4106)
+- Group 'productChecksum' and 'productsEquals' logic for all supported products types. Remove 'checksum' when editing product.
+  Remove and add coupon when user login Remove 'NA' as default company. Show qty in microcart for all types of product.
+  Remove preload font - it gives good performance, but vue-meta refresh page, because there is script onload. - @gibkigonzo (#4128)
+- Keep old category before route is resolved - @gibkigonzo (#4124)
+- Added comments in 'productsEqual' and change logic for different types of products. Remove login user after order in Checkout. Allow changing qty for 'group' and 'bundle'.products - @gibkigonzo (#4144)
+- Fix incorrect root categories when extending includeFields - @Michal-Dziedzinski (#4090)
+- Add onlyPositive prop to BaseInputNumber to not allow user type negative value - @Michal-Dziedzinski (#4136)
+- Await for cart/authorize while login user - @gibkigonzo (#4133)
+- Fixed `NOT_ALLOWED_SSR_EXTENSIONS_REGEX` to only match with file extensions having a dot - @haelbichalex (#4100)
+- Add lazy load for vue-carousel - @gibkigonzo (#4157)
+
+## [1.11.1] - 2020.02.05
+
+### Added
+
+- Add `ProductPrice` component with bundleOptions and customOptions prices - @gibkigonzo (#3978)
+- Add lazy create cart token - @gibkigonzo (#3994)
+
+### Changed / Improved
+
+- Set cache tag when loading a category - @haelbichalex (#3940)
+- In development build `webpack.config.js` in theme folder is now called without the `default` key - @psmyrek
+
+### Fixed
+
+- Added Finnish translations - @mattiteraslahti and @alphpkeemik
+- Updated Estonian translations to match 1.11 - @alphpkeemik
+- CookieNotification CSR&SSR mismatch fixed - @Fifciu (#3922)
+- The attribute filter in `attribute/list` was not filtering the already loaded attributes properly - @pkarw (#3964)
+- Update `hasProductErrors` in Product component and support additional sku in custom options - @gibkigonzo (#3976)
+- Fixed logic for generating \${lang}.json files in multi-store setup - @jpkempf
+- Fixed logic for collecting valid locales in single-store, multi-lang setup - @jpkempf
+- Make initial custom option value reactive - @gibkigonzo
+- Fixed No image thumbnails leaded on 404 page - @andrzejewsky (#3955)
+- Fixed Stock logic not working with manage_stock set to false - @andrzejewsky - (#3957)
+- Support old price format in `ProductPrice` - @gibkigonzo (#3978)
+- Fixed product bundle comparison condition - @gk-daniel (#4004)
+- Add event callback for checkout load initial data - @gibkigonzo(#3985)
+- Fixed `Processing order...` modal closing too early - @grimasod (#4021)
+- Keep registered payment methods after `syncTotals` - @grimasod (#4020)
+- Added status code to the cache content and use it in cache response - @resubaka (#4014)
+- Fixed sku attribute is missing on compare page - @gibkigonzo (#4036)
+- Fixed z-index for aside in compare list - @gibkigonzo (#4037)
+- Disable checking max quantity when manage stock is set to false - @gibkigonzo (#4038)
+- Add products quantity only when token is created - @gibkigonzo (#4017)
+- Revert init filters in Vue app - add storeView to global/store and pass it to filters - @gibkigonzo (#3929)
+- Fix v-model not working in BaseRadioButton - @lukeromanowicz (#4035)
+- always keep filters values as array of object - @gibkigonzo (#4045)
+- Fix ecosystem config to work with ts-node - @andrzejewsky (#3981)
+
+## [1.11.0] - 2019.12.20
+
+### Added
+
+- Add unit tests for `core/modules/url` - @dz3n (#3469)
+- Add unit test for `core/modules/checkout` - @psmyrek (#3460)
+- Add defense against incomplete config in ssr renderer - @oskar1233 (#3774)
+- Add unit tests for `core/modules/order` - @dz3n (#3466)
+- Add unit tests for `core/modules/user` - @dz3n (#3470)
+- Add to cart from Wishlist and Product listing for simple products - @Dnd-Dboy, @dz3n (#2637)
+- Add global Category and Breadcrumb filters, defined in local.json - @grimasod (#3691)
+- Add constant which conditions the number of products loading per page - @AdKamil (#3630)
+- Added price filtering key as config - @roywcm
+
+### Fixed
+
+- Fixed missing parameter to query function from cms/store/block/actions - @georgiev-ivan (#3909)
+- Always close zoom overlay after changing product - @psmyrek (#3818)
+- Fixed problem with cutting image height in category page on 1024px+ screen res - @AdKamil (#3781)
+- Fixed null value of search input - @AdKamil (#3778)
+- Fixed product sorting - @AdKamil (#3785)
+- Fixed displaying `sale` and `new` mark - @andrzejewsky (#3800)
+- Fixed sorting on category page and product tile sizing - @andrzejewsky (#3817)
+- Redirect from simple product using url_path - @benjick (#3804)
+- Mount app in 'beforeResolve' if it's not dispatched in 'onReady' - @gibkigonzo (#3669)
+- Fixed AMP pages - @andrzejewsky (#3799)
+- Fixed Product page breadcrumbs problem when products are in multiple categories in different branches of the category tree - @grimasod (#3691)
+- Change translation from jp-JP to ja-JP - @gibkigonzo (#3824)
+- Fixed ecosystem config for pm2 - @andrzejewsky (#3842)
+- Fixed `mappingFallback` for extending modules - @andrzejewsky (#3822)
+- Fixed adding products search results to category-next product store - @grimasod (#3877)
+- Use `defaultSortBy` for sorting category products by default @haelbichalex (#3873)
+- Fixed some potential mutations of Config object in `catalog` and `catalog-next` - @grimasod (#3843)
+- Set `null` as default value for custom option in product page - @gibkigonzo (#3885)
+- Fixed Breadcrumb filters - apply to second category fetch - @grimasod (#3887)
+- Fixed `config.storeViews.commonCache` being ignored - @grimasod (#3895)
+- Fixed static pages, password notification, offline mode #3902 - @andrzejewsky (#3902)
+- Fixed error page display with enabled multistore - @gibkigonzo (#3890)
+- Fixed edit shipping address in my account - @gibkigonzo (#3921)
+- Fetch cms_block content in serverPrefetch method - @gibkigonzo (#3910)
+- Fixed saving invalidated user token - @andrzejewsky (#3923)
+- Keep category products objects on ssr - @gibkigonzo (#3924)
+- product breadcrumbs - check if current category is not highest one - @gibkigonzo (#3933)
+
+### Changed / Improved
+
+- Changed pre commit hook to use NODE_ENV production to check for debugger statements - @resubaka (#3686)
+- Improve the readability of 'getShippingDetails()' and 'updateDetails()' method of UserShippingDetails component - @adityasharma7 (#3770)
+- Keep git after yarn install in dockerfile - @ddanier (#3826)
+- Update the Storage Manager shipping details cache immediately when then Vuex checkout store is updated - @grimasod (#3894)
+
+## [1.11.0-rc.2] - 2019.10.31
+
+### Added
+
+- Add defense for incomplete config in preferchCachedAttributes helper
+- Add unit test for \`core/modules/cms\` - @krskibin (#3738)
+
+### Fixed
+
+- Fixed deprecated getter in cmsBlock store - @resubaka (#3683)
+- Fixed problem around dynamic urls when default storeView is set with appendStoreCode false and url set to / . @resubaka (#3685)
+- Fixed three problems you can run into when you have bundle products - @resubaka (#3692)
+- Reset nested menu after logout - @gibkigonzo (#3680)
+- Fixed handling checkbox custom option - @gibkigonzo (#2781)
+- Fixed typos in docs - @afozbek (#3709)
+- Fixed VSF build fails for some people due to lack of dependencies in the container - @krskibin (#3699)
+- Fixed two graphql problems, one with cms_blocks and the other with default sort order - @resubaka (#3718)
+- Allow falsy value for `parent_id` when searching category - @gibkigonzo (#3732)
+- Remove including .map files in service worker cache - @gibkigonzo (#3734)
+- Changed notification message object to factory fn - @gibkigozno (#3716)
+- Load recently viewed module in my account page - @gibkigonzo (#3722)
+- Added validation message for city field on checkout page - @dz3n (#3723)
+- Make price calculation based on saved original prices - @gibkigonzo (#3740)
+- Improving is_comparable to work with booleans and digits - @dz3n (#3697)
+- Fixed displaying categories on search menu - @andrzejewsky (#3758)
+- Fixed broken link for store locator - @andrzejewsky (#3754)
+- Fixed instant checkout functionality - @andrzejewsky (#3765)
+- Fixed links to the promoted banners - @andrzejewsky (#3753)
+- Fixed missing parameter in the compare list - @andrzejewsky (#3757)
+- Fixed product link on mobile - @andrzejewsky (#3772)
+- Custom module `ConfigProvider` aren't called anymore - @cewald (#3797)
+
+### Added
+
+- Added Estonian translations - @alphpkeemik
+- Added support for ES7 - @andrzejewsky (#3690)
+- Added unit tests for `core/modules/mailer` - @krskibin (#3710)
+- Get payment methods with billing address data - @rain2o (#2878)
+- Added custom page-size parameter for `category-next/loadCategoryProducts` action - @cewald (#3713, #3714)
+- Remove unused dayjs locales - @gibkigonzo (#3498)
+- check max quantity in microcart - @gibkigonzo (#3314)
+- Add unit tests for `core/modules/newsletter` - @psmyrek (#3464)
+- Add unit test for `core/modules/wishlist` - @psmyrek (#3471)
+
+### Changed / Improved
+
+- Use `encodeURIComponent` to encode get parameters in `multimatch.js` - @adityasharma7 (#3736)
+
+## [1.11.0-rc.1] - 2019.10.03
+
+### Added
+
+- Add unit testing to Husky on pre-push hook - @mattheo-geoffray (#3475)
+- Add unit testing on breadcrumbs feature - @mattheo-geoffray (#3457)
+- HTML Minifier has been added, to enable it please switch the `config.server.useHtmlMinifier` - @pkarw (#2182)
+- Output compression module has been added; it's enabled by default on production builds; to disable it please switch the `src/modules/serrver.ts` configuration - @pkarw (#2182)
+- Sort CSV i18n files alphabetically in pre-commit Git hook - @defudef (#2657)
+- Cache invalidate requests forwarding support - @pkarw (#3367)
+- Extend storeview config after another storeview in multistore mode - @lukeromanowicz (#3057, #3270)
+- Default storeview settings are now overridden by specific storeview settings - @lukeromanowicz (#3057)
+- Apache2 proxy header support for store based on host - @resubaka (#3143)
+- Items count badges for Compare products and wishlist icons at header - @vishal-7037 (#3047)
+- Added product image in order summary - @obsceniczny (#2544)
+- Add icons on the product tiles that allow to add to the wish list and to the list to compare products from the list of products - @Michal-Dziedzinski (#2773)
+- Get also none product image thumbnails via API - @cewald, @resubaka (#3207)
+- Added a config option `optimizeShoppingCartOmitFields` - @EmilsM (#3222)
+- Added information on the number of available products - @Michal-Dziedzinski (#2733)
+- Added possibility to change color or size of the product that is already in the cart - @andrzejewsky (#2346)
+- Experimental static files generator - @pkarw (#3246)
+- Added price formatting based on locales in multistore - @andrzejewsky (#3060)
+- Added support for tax calculation where the values from customer_tax_class_ids is used - @resubaka (#3245)
+- Added loading product attributes (`entities.productListWithChildren.includeFields`) on category page - @andrzejewsky (#3220)
+- Added config to set Cache-Control header for static assets based on mime type - @phoenix-bjoern (#3268)
+- Improve `category-next/getCategoryFrom` and `category-next/getCurrentCategory` to be more flexible - @cewald (#3295)
+- Added test:unit:watch with a workaround of a jest problem with template strings - @resubaka (#3351)
+- Added test to multistore.ts so it is nearly fully unit tested - @resubaka (#3352)
+- Added test:unit:watch with a workaround of a jest problem with template strings - @resubaka (#3351, #3354)
+- Added test to helpers/index.ts so it is partly tested - @resubaka (#3376, 3377)
+- Added hooks in cart module - @andrzejewsky (#3388)
+- Added config for the defaultTitle compitable with multistore - @cnviradiya (#3282)
+- Added husky package to manage lint check only for staged files in git @lorenaramonda (#3444)
+- Change text from "is out of the stock" to "is out of stock" - @indiebytes (#3452)
+- Added general purpose hooks - @andrzejewsky (#3389)
+- Added loading of your own searchAdaptor - @resubaka (#3405K)
+- Added lazy hydration for home page - @filrak (#3496, #3565)
+- Added i18n support for modules - @dz3n (#3369)
+- Added support for creating localized child routes - @gibkigonzo (#3489)
+- Added tests for actions and mutations in 'core/modules/recently-viewed' - @gibkigonzo (#3467)
+- Added tests for actions, mutations and components in 'core/modules/compare' - @gibkigonzo (#3467)
+- Added support to load tracing libs at the start of the app - @resubaka (#3514, #3566)
+- Added tests for actions and mutations in 'core/modules/notification' - @gibkigonzo (#3465)
+- Added tests for actions, mutations and helpers in 'core/modules/review' - @gibkigonzo (#3468)
+- Add new Google-Tag-Manager module using new module registration - @cewald (#3524, #3509)
+- Exclude GTM product attributes setup into config json - @dlandmann, @cewald (#3509, #3524)
+- Add configuration option to format currency sign placement and space in price - @cewald (#3574)
+- Add ability to pass `pageSize` and `currentPage` to order history API call for pagination - @rain2o
+- Added italian translations - @lorenaramonda (3076)
+- Route Manager Queue for adding routes efficiently and with an optional priority - @grimasod (#3540)
+- Added tests for cart module actions - @andrzejewsky (#3023)
+- Fixed a problem with type changes in the state when extending a store - @resubaka (#3618)
+
+### Fixed
+
+- Attributes loader, breadcrumbs loader fixes - @pkarw (#3636)
+- Fix for the product attribute labels displayedd on the PDP - @pkarw (#3530)
+- Fix the mix of informal and polite personal pronouns for German translations - @nhp (#3533)
+- Fix for comparison list being not preserved between page reloads - @vue-kacper (#3508)
+- Fix 'fist' typos - @jakubmakielkowski (#3491)
+- Fix for wrong breadcrumb urls in the multistore mode - @pkarw (#3359)
+- Fix for displaying gallery images for unavaialble product variants - @pkarw (#3436)
+- Fix for `null` in search query input - @pkarw (#3474)
+- Unable to place order has been fixed; the `entities` module was wrongly imported - @pkarw (#3453)
+- Fixed product link in wishlist and microcart - @michasik (#2987)
+- Fixed naming strategy for product prices - `special_priceInclTax` -> `special_price_incl_tax`, `priceInclTax` -> `price_incl_tax`, `priceTax` -> `price_tax`; old names have been kept as @deprecated - @pkarw (#2918)
+- The `final_price` field is now being used for setting the `special_price` or `price` of the product (depending on the value); `final_price` might been used along with `special_price` with Magento for the products with activated catalog pricing rules - @pkarw (#3099)
+- Resolve problem with getting CMS block from cache - @qiqqq (#2499)
+- Make image proxy url work with relative base url - @cewald (#3158)
+- Fixed memory leak with enabled dynamicConfigReload - @dimasch (#3075)
+- Fixed error for the orderhistory null for google-tag-manager extension - @cnviradiya (#3195)
+- Fixed swatches not rendering properly at product detail page issue - @vishal-7037 (#3206)
+- Fixed label of configurable options in cart after product just added - @cheeerd (#3164)
+- Fixed eslint warning in Product Page, removed v-if from v-for node - @przspa (#3181)
+- Fixed aspect ratio in ProductImage component - @przspa (#3187)
+- Fixed AMP Product page - @przspa (#3227)
+- Fixed when store has updated, but plugin didn't called - @serzilo (#3238)
+- Fixed first call of prepareStoreView when SSR - @resubaka (#3244)
+- Add ./packages as volume to docker-compose.yml - @cewald (#3251)
+- Fixed mail sending and add error logger - @Michal-Dziedzinski (#3265)
+- Fixed page not found http status code - @phoenix-bjoern (#3243)
+- Fixed missing coupon code after user logged in - @andrzejewsky (#3153)
+- Fixed bug around appendStoreCode in formatCategoryLink. - @resubaka (#3306)
+- Fixed static category links in cms contents on homepage and MinimalFooter - @MariaKern (#3292)
+- Fixed tax calulaction where products was send as parameter but products.items where the right paramater - @resubaka (#3308)
+- Fixed module extendStore for array property inside store - @przspa (#3311)
+- Fixed ordering of the categories and subcategories in sidebar - @andrzejewsky (#2665)
+- Some SSR problems with urlDispatcher during multireloading page - @patzick (#3323)
+- Fixed two bugs in `category-next/getCategoryFrom` (#3286) and `category-next/getCurrentCategory` (#3332) - @cewald (#3295)
+- Fixed login popup close icon position - @przspa (#3393)
+- Fixed styles for original price on Wishlist sidebar - @przspa (#3392)
+- Redirect loop on dispatching dynamic routes in CSR running multistore mode - @cewald, @lukeromanowicz, @resubaka (#3396)
+- Adjusted ProductVideo props to right names - @przspa (#3263)
+- Fixed Doubled SKU row in compare tab - @manvendra-singh1506 (#3447)
+- Fixed warning in product details because of duplicate `product` property in `AddToCompare` mixin - @cewald (#3428)
+- Fixed adding unconfigured product to cart from homepage - @lukeromanowicz (#3512)
+- Fixed "Clear Wishlist" Button - @dz3n (#3522)
+- Fixed hash in dynamically resolved urls causing resolving issues - @lukeromanowicz (#3515)
+- Fix invalid routes in ButtonOutline and ButtonFull - @lukeromanowicz (#3541, #3545)
+- Fix adding notification with 'hasNoTimeout' after normal notification - @gibkigonzo (#3465)
+- Logged-in user's shipping address on checkout page - @przspa (#2636)
+- Fix for the "add to cart" test
+- Fixed error with dayjs when locale is 2-digit (without a '-') @rain2o (#3581)
+- Fix applying coupon - @andrzejewsky (#3578)
+- Prevent caching storage instance in plugin module scope - @gibkigonzo (#3571)
+- Fixed incorrect image sizes in related section on product page - @andrzejewsky (#3590)
+- Fix typo on default language - @lorenaramonda (#3076)
+- Remove race condition while loading locale messages - @gibkigonzo (#3602)
+- Fix displaying same country twice in the in the country switcher - @andrzejewsky (#3587)
+- Fixed resolving store code on SSR - @andrzejewsky (#3576)
+- Clear user data if error occurs while login - @gibkigonzo (#3588)
+- Fix loading bestsellers on 404 error page - @andrzejewsky (#3540)
+- Remove modifying config by reference in multistore - @gibkigonzo (#3617)
+- Add translation key for add review - @gibkigonzo (#3611)
+- Add product name prop to reviews component - @gibkigonzo (#3607)
+- Show default cms pages when current store code is not equals to default - @andrzejewsky (#3579)
+- Fix login errors with mailchimp - @gibkigonzo (#3612)
+- Hydration error on homepage - @patzick (#3609)
+- Fix adding products with custom options - @andrzejewsky (#3597)
+- check silentMode in errors on the same level as task.silent - @gibkigonzo (#3621)
+- Add missing parameters (`size`,`start`) to `quickSearchByQuery()` in `attribute/list` action - @cewald (#3627)
+- Fix breadcrumb homepage link in cms static pages - @andrzejewsky (#3631)
+- Fixed special price that can break when you change pages (browser navigation for/back) or just go from category to product page - @resubaka (#3638)
+- Fixed problem with losing browser history - @andrzejewsky (#3642)
+- Fixed wrong links on the static pages - @andrzejewsky (#3659)
+- Fixed problem with changing quantity in offline mode on product page - @andrzejewsky (#3662)
+- Fixed problem with extending storeView configuration - @andrzejewsky (#3655)
+- Removed infinite loop when changing checkbox in shipping details - @gibkigonzo (#3656)
+- Fixed displaying single order in the profile - @andrzejewsky (#3663)
+- Make microcart ui consistent for all types of products - @gibkigonzo (#3673)
+- Fixed missing storeCode in metaInfo - @andrzejewsky (#3674)
+- Removed showing popup when you have just logged out - @andrzejewsky (#3680)
+
+### Changed / Improved
+
+- Change Product quantity field validation - @jakubmakielkowski (#3560)
+- Update confirmation page in offline mode - @jakubmakielkowski (#3100)
+- Removed server order id from ThankYouPage - @federivo (#3480)
+- Shipping address is saved as default when not logged in user chooses to create account during checkout - @iwonapiotrowska (#2636)
+- The `attribute.list_by_id` and `attribute.list_by_code` from the `window.__INITIAL_STATE__` which could be even up to 50% of the product page size. - @pkarw (#3281)
+- Can set transition style for Modal content - @grimasod (#3146)
+- Added stock to cart items - @cheeerd (#3166)
+- Moves theme specific stores and components into themes - @michasik (#3139)
+- Decreased the `localStorage` quota usage + error handling by introducing new config variables: `config.products.disablePersistentProductsCache` to not store products by SKU (by default it's on). Products are cached in ServiceWorker cache anyway so the `product/list` will populate the in-memory cache (`cache.setItem(..., memoryOnly = true)`); `config.seo.disableUrlRoutesPersistentCache` - to not store the url mappings; they're stored in in-memory cache anyway so no additional requests will be made to the backend for url mapping; however it might cause some issues with url routing in the offline mode (when the offline mode PWA installed on homescreen got reloaded, the in-memory cache will be cleared so there won't potentially be the url mappings; however the same like with `product/list` the ServiceWorker cache SHOULD populate url mappings anyway); `config.syncTasks.disablePersistentTaskQueue` to not store the network requests queue in service worker. Currently only the stock-check and user-data changes were using this queue. The only downside it introuces can be related to the offline mode and these tasks will not be re-executed after connectivity established, but just in a case when the page got reloaded while offline (yeah it might happen using ServiceWorker; `syncTasks` can't be re-populated in cache from SW) - @pkarw (#3180)
+- Translation file improvements - @vishal-7037 (#3198)
+- Added configuration for max attempt task & cart by pass - @cnviradiya (#3193)
+- Added catching of errors when ES is down - @qiqqq
+- Added debounce for updating quantity method in the cart - @andrzejewsky (#3191)
+- New modules API and rewrite - @filrak, @JCown (#3144)
+- Refactored the vuex user module - @andrzejewsky (#3095)
+- Brazilian Portuguese (pt_BR) translation improved - @pxfm (#3288)
+- Moved store/lib to /lib - @pxfm (#3253)
+- Corrected usage of "configurableChildrenStockPrefetchStatic" setting, refactored logic to tested helper - @philippsander (#859)
+- Improved some of the german translations in spelling and wording - @MariaKern (#3297)
+- Added lazy-hydrate for category products - @andrzejewsky (#3327)
+- Refactored vuex order module - @andrzejewsky (#3337)
+- Changed body no-scroll behavior for overlapped element - @przspa (#3363)
+- `config.dynamicConfigReload` option should use deep copy for `Object.assign()` - @cewald (#3372)
+- Add translation for the defaultTitle - @cnviradiya (#3282)
+- Refactored vuex tax module - @andrzejewsky (#3337)
+- Refactored vuex stock module - @andrzejewsky (#3337)
+- Removed extra unnecessary code from BaseInputNumber - @cnviradiya (#3410)
+- Refactored vuex checkout module - @andrzejewsky (#3337)
+- Moved my-account authentication guard to MyAccount core page - @przspa (#3325)
+- Refactored vuex compare module - @andrzejewsky (#3337)
+- Refactored vuex whishlist module - @andrzejewsky (#3337)
+- Refactored vuex cms module - @andrzejewsky (#3337)
+- Refactored vuex review module - @andrzejewsky (#3337)
+- Refactored vuex newsletter module - @andrzejewsky (#3337)
+- Changed type of Id fields related to product, category and attribute to support numeric as well as string - @adityasharma7 (#3456)
+- Optimized fetching product data on homepage - @lukeromanowicz (#3512)
+- `localizedRoute()` now supports path (and prefers over fullPath) in LocalizedRoute objects - @lukeromanowicz (#3515)
+- Move setting review_status from VSF to VSF-API - @afirlejczyk
+- `localizedRoute()` doesn't return urlDispatcher routes anymore. Use localizedDispatcherRoute instead - @lukeromanowicz (#3548)
+- Improved scrolling in Safari on iOS devices (sidebars) - @phoenixdev-kl (#3551)
+- Improved cookie and offline badges (z-index, overflow) - @phoenixdev-kl (#3552)
+- Improved translations: Replaced concatenations with "named formatting" (see http://kazupon.github.io/vue-i18n/guide/formatting.html#named-formatting) - @phoenixdev-kl (#3550)
+- Added `filterMinimumShouldMatch` to ES queries in order to support ES7 - @pkarw (#1692)
+- Pass `RouteManager` as proxy for router.addRoutes - @gibkigonzo (#3479)
+- Added generic types to hooks - @gibkigonzo
+- Change sku to string when checking products equality - @gibkigonzo (#3606)
+- Pass to `registerModule` all parameters as one object - @gibkigonzo (#3634)
+- Include shipping address data in request for shipping methods for more accurate filtering - @rain2o (#2515)
+- remove 'disabled' flag in storeViews config - @gibkigonzo (#3659)
+
+## [1.10.5] - 28.11.2019
+
+### Fixed
+
+- Disable product mutation when assigning product variant - @gibkigonzo (#3735)
+- Fix issue with Cannot assign to read only property 'storeCode' - @yuriboyko (#3748)
+- Render correct category links when multistore is active - @gibkigonzo (#3753)
+- Disable product mutation when assigning product variant - @gibkigonzo (#3735)
+- Fixed null value of search input - @AdKamil (#3778)
+- Sorting fixed on category page - @AdKamil (#3785)
+- Mount app in 'beforeResolve' if it's not dispatched in 'onReady' - @gibkigonzo (#3669)
+- change translation from jp-JP to ja-JP - @gibkigonzo (#3824)
+- Fix product images, my account link, warnings in console - @andrzejewsky (#3850)
+
+## [1.10.4] - 18.10.2019
+
+### Fixed
+
+- Added try/catch for fetching single product in cart synchronization - @gibkigonzo (#3632)
+- Removed infinite loop when changing checkbox in shipping details - @gibkigonzo (#3656)
+- Remove modifying config by reference in multistore - @gibkigonzo (#3617)
+- Fix displaying same country twice in the in the country switcher - @andrzejewsky (#3587)
+- Remove race condition while loading locale messages - @gibkigonzo (#3602)
+- Fixed special price that can break when you change pages (browser navigation for/back) or just go from category to product page - @resubaka (#3638)
+- Change sku to string when checking products equality - @gibkigonzo (#3606)
+- Fixed problem with losing browser history - @andrzejewsky (#3642)
+- Fixed resolving store code on SSR - @andrzejewsky (#3576)
+- Fixed styles for original price on Wishlist sidebar - @przspa (#3392)
+- Added debounce for updating quantity method in the cart - @andrzejewsky (#3191)
+- Improved scrolling in Safari on iOS devices (sidebars) - @phoenixdev-kl (#3551)
+- Improved cookie and offline badges (z-index, overflow) - @phoenixdev-kl (#3552)
+- Added config to set Cache-Control header for static assets based on mime type - @phoenix-bjoern (#3268)
+- Added catching of errors when ES is down - @qiqqq
+- `localizedRoute()` doesn't return urlDispatcher routes anymore. Use localizedDispatcherRoute instead - @lukeromanowicz (#3548)
+- Fixed hash in dynamically resolved urls causing resolving issues - @lukeromanowicz (#3515)
+- `localizedRoute()` now supports path (and prefers over fullPath) in LocalizedRoute objects - @lukeromanowicz (#3515)
+- Decreased the `localStorage` quota usage + error handling by introducing new config variables: `config.products.disablePersistentProductsCache` to not store products by SKU (by default it's on). Products are cached in ServiceWorker cache anyway so the `product/list` will populate the in-memory cache (`cache.setItem(..., memoryOnly = true)`); `config.seo.disableUrlRoutesPersistentCache` - to not store the url mappings; they're stored in in-memory cache anyway so no additional requests will be made to the backend for url mapping; however it might cause some issues with url routing in the offline mode (when the offline mode PWA installed on homescreen got reloaded, the in-memory cache will be cleared so there won't potentially be the url mappings; however the same like with `product/list` the ServiceWorker cache SHOULD populate url mappings anyway); `config.syncTasks.disablePersistentTaskQueue` to not store the network requests queue in service worker. Currently only the stock-check and user-data changes were using this queue. The only downside it introuces can be related to the offline mode and these tasks will not be re-executed after connectivity established, but just in a case when the page got reloaded while offline (yeah it might happen using ServiceWorker; `syncTasks` can't be re-populated in cache from SW) - @pkarw (#2985)
+- Fixed evaluate detailsLink in the cookie notification - @benjick (#3689)
+
+## Added
+
+- Added german translations - @schwerdt-ke (3076)
+
+## [1.10.3] - 2019.09.18
+
+### Fixed
+
+- Broken sidebar menu in mobile view - @przspa (#3549)
+- UrlDispatcher issues with multistore routes - @pkarw (#3568)
+
 ## [1.10.2] - 2019.09.06
 
 ### Fixed
+
 - Product image is missing on PDP - @przspa, @NavaneethVijay (#3483)
 - Mounting app when routes are resolved, should completly remove recent SSR errors - patzick (#3499)
 - Fixed `categoriesDynamicPrefetchLevel` that now can be equal to 0 - @pkarw (#3495)
@@ -14,6 +595,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.10.1] - 2019.09.03
 
 ### Fixed
+
 - Invalid Discount code error handled by theme - @grimasod (#3385)
 - Fallback for empty value or no_selection child image - @ngongoll (#3397)
 - `order.order_id` was not assigned in the `orders.directBackendSync` mode - @pkarw (#3398)
@@ -26,6 +608,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.10.0] - 2019.08.10
 
 ### Added
+
+- Cast cart_id as string - Order schema expects string, Magento does not generate a string as cart id in every case - @DaanKouters (#3097)
 - Make installer work for windows - @Flyingmana (#2616)
 - "Clear cart" button in the cart - @jablpiotrek (#2587)
 - Global config api path under `api.url` - @BartoszLiburski (#2622)
@@ -46,9 +630,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OrderNumber on ThankYouPage - @Flyingmana (#2743)
 
 ### Removed
-- The getter `cart/totals` has been replaced with `cart/getTotals` - @pkarw (#2522)
-- The getter `cart/coupon` has been replaced with `cart/getCoupon` - @pkarw (#2522)
-- The getter `cart/totalQuantity` has been replaced with `cart/getItemsTotalQuantity` - @pkarw (#2522)
+
+- The getter `cart/totals` has ben replaced with `cart/getTotals` - @pkarw (#2522)
+- The getter `cart/coupon` has ben replaced with `cart/getCoupon` - @pkarw (#2522)
+- The getter `cart/totalQuantity` has ben replaced with `cart/getItemsTotalQuantity` - @pkarw (#2522)
 - The event `cart-before-save` has been removed - @pkarw (#2522)
 - The action `cart/save` has been removed - @pkarw - (#2522)
 - Some deprecated config options: `useShortCatalogUrls` and `setupVariantByAttributeCode` have been removed - @pkarw (#2915)
@@ -57,6 +642,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make all links with the primary color - @hackbard (#2932)
 
 ### Fixed
+
 - Back button on the Error page has been fixed - @pkarw (#3077)
 - Special price got zeroed - @pkarw (#2940)
 - Microcart tax + discount totals fix - @pkarw (#2892)
@@ -108,6 +694,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clear compare list after logout - @patzick (#3348)
 
 ### Changed / Improved
+
 - The `cart/sync`, `cart/addItems`, `cart/removeItem` and `cart/updateQuantity` now returns the `diffLog` object with all the notifications, server statuses and items changed during the shopping cart sync
 - The `cart/addItem` is no longer displaying the error messages - please use the `diffLog.clientNorifications` to update the UI instead (take a look at the `AddToCart.ts` for a reference)
 - The action `cart/userAfterLoggedin` got renamed to `cart/authorize` - @pkarw (#2522)
@@ -119,7 +706,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disabled the server cart sync in case user is in the checkout - @pkarw (#2749)
 - Improved ProductGalleryCarousel component to handle nonnumeric options id’s - @danieldomurad (#2586)
 - Number of displayed products is now visible on PLP on desktop - @awierzbiak (#2504)
-- Improved visibility of product SKU in wishlist  - @PanMisza (#2606)
+- Improved visibility of product SKU in wishlist - @PanMisza (#2606)
 - Instant focus to search input field after click on search icon in navbar - @ca1zr (#2608)
 - Login flow from authorized pages after session expired, show the modal with new error message and redirect after login - @gdomiciano, @natalledm (#2674)
 - Added support for the newest node version - @gdomiciano (#2669)
@@ -155,7 +742,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored Travis config - @Tjitse-E (#3035)
 - Renamed the `stock/check` to `stock/queueCheck` to better emphasize it's async nature; added `stock/check` which does exactly what name suggests - returning the true stock values - @pkarw (#3150)
 - Cart unit tests throwing lots of type warnings - @lukeromanowicz (#3185)
-- Lack of possibility to mock src modules and  theme components - @lukeromanowicz (#3185)
+- Lack of possibility to mock src modules and theme components - @lukeromanowicz (#3185)
 - Outdated signature of Registration hooks for google-tag-manager - @vishal-7037 (#3208)
 - Added serveral missing german translations and fixed german language file structure - @unherz (#3202)
 - Refactored the informal way of adressing to formal in german translation files - @unherz (#3213)
@@ -163,7 +750,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.9.2] - 2019.06.10
 
 ### Fixed
-- Instant Checkout visible on  Safari - @przspa (#2991)
+
+- Instant Checkout visible on Safari - @przspa (#2991)
 - Search Sidebar on Safari - @przspa (#2990)
 - Country label style - @przspa (#2989)
 - BaseInputNumber for qty of the product in the cart can change by using arrows - @przspa (#2988)
@@ -174,6 +762,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.9.1] - 2019.05.27
 
 ### Fixed
+
 - Remove security vulnerabilities by updating project dependencies - @patzick (#2942)
 - Fix Configurable Products not accessible in CSR when children visibility is set to "not visible individually" - @revlis-x (#2933)
 - ProductTile placeholders are visible on SSR - @patzick (#2939)
@@ -181,18 +770,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.9.0] - 2019.05.06
 
 ### Added
+
 - The Url Dispatcher feature added for friendly URLs. When `config.seo.useUrlDispatcher` set to true the `product.url_path` and `category.url_path` fields are used as absolute URL addresses (no `/c` and `/p` prefixes anymore). Check the latest `mage2vuestorefront` snapshot and reimport Your products to properly set `url_path` fields - #2010 - @pkarw
 - Unit tests of cart module written in jest - @lukeromanowicz (#2305)
 - validation for UTF8 alpha and alphanumeric characters in most checkout fields - @lromanowicz (#2653)
 - helper to process config urls with default endpoint host `config.api.host` - @patzick (#2858)
 
 ### Changed / Improved
+
 - The `core/helpers` parsing URL methods exchanged to `query-string` package - @pkarw (#2446)
 - Unit tests in Karma are now removed in favor of jest - @lukeromanowicz (#2305)
 - Material Icons are loaded asynchronously - @JKrupinski, @filrak (#2060)
 - Update to babel 7 - @lukeromanowicz (#2554)
 
 ### Fixed
+
 - For first time setup of the SSR Cache, a local cache-version.json file is required. The path has been removed from .gitignore and a template has been added. - @rio-vps
 - Gallery low quality image in offline mode when high quality already cached - @patzick (#2557)
 - Payment issue when no address set - @szafran89 (#2593)
@@ -226,28 +818,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.8.5] - 2019-04-17
 
 ### Fixed
+
 - Memory leaks on SSR with Vue.use - @patzick (#2745)
 
 ## [1.8.4] - 2019-03-26
 
 ### Fixed
+
 - Problem with incomplete category products load for offline use - @patzick (#2543)
 - Category products view crash on scrolling down in offline mode - @patzick (#2569)
-- Default propery issue for the col-xs-* classes - @cnviradiya (#2558)
+- Default propery issue for the col-xs-\* classes - @cnviradiya (#2558)
 - Wishlist and compare list not cached properly - @filrak (#2580)
 
 ### Changed / Improved
+
 - Category and Homepage products are now cached for offline use on SSR entry - @patzick (@1698)
 
 ## [1.8.3] - 2019-03-03
 
 ### Added
+
 - Payment Request API integration - @qiqqq (#2306)
 - New reactive helper to check online state. Usage: `import { onlineHelper } from '@vue-storefront/core/helpers'` and then `onlineHelper.isOnline` - @patzick (#2510)
 - Cart count config, allows you to display the item count instead of a sum of the item quantities - @pauluse (#2483)
 - Video support in Product Gallery component. - @rain2o (#2433)
 
 ### Fixed
+
 - Problem with placing second order (unbinding payment methods after first order) - @patzick (#2195, #2503)
 - Remaking order on user orders page - @patzick (#2480)
 - Images blinking on category page - @pkarw (#2523)
@@ -256,6 +853,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Non-integer qty of product added to the cart - @pkarw (#2517)
 
 ### Changed / Improved
+
 - Fixed an issue where the correct image for a product configuration wasn't set on the product page image carousel. Also added the fix on the productcarousel in the zoom component - @DaanKouters (#2419)
 - Way of creating VS Modules was changed to use factory method instead of explict object creation. - @filrak (#2434)
 - Added clear filters button on desktop also and only show if filters are applied - @DaanKouters (#2342)
@@ -285,23 +883,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed editing mode from My Newsletter section - @aniamusial (#2766)
 - Clicking Remake order now adds your items and redirects you to the checkout - @mikesheward (#2710)
 
-
 ### Deprecated / Removed
+
 - `@vue-storefront/store` package deprecated - @filrak
 
 ## [1.8.2] - 2019-02-11
+
 - Fixed docker-compose configuration for network_mode and TS build config - @lukeromanowicz (#2415)
 
 ## [1.8.1] - 2019-02-10
+
 This is hot-fix release for fixing the payment methods switching issue when both: `payments-cash-on-delivery` and `payments-backend-methods` modules enabled.
 
 ### Changed / Improved
- - Fixed doubled invlication of `placeOrder` when both: `payments-cash-on-delivery` and `payments-backend-methods` modules enabled - #2405
+
+- Fixed doubled invlication of `placeOrder` when both: `payments-cash-on-delivery` and `payments-backend-methods` modules enabled - #2405
 
 ## [1.8.0] - 2019-02-07
+
 Additional migration tips are available [here](https://github.com/DivanteLtd/vue-storefront/blob/master/docs/guide/upgrade-notes/README.md).
 
 ### Added
+
 - Chinese translation added - @wadereye (#2265)
 - Categories filter in search view - @kjugi, @patzick (#1710)
 - AsyncDataLoader feature - @pkarw (#2300)
@@ -314,6 +917,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Hotjar integration - @lukeromanowicz (#840)
 
 ### Changed / Improved
+
 - Theme structure improvements - @filrak (#2223)
 - Type interfaces and refactor - @filrak (#2227, #2267)
 - Changed beforeRegistration and afterRegistration hooks signature. Now it contains only one object VSF. The subfields are the same as before so changing `beforeRegistration( Vue, config, store, isServer )` to `beforeRegistration({ Vue, config, store, isServer })`(and same with `afterRegistration`) is enough to make a proper migration to new API. - @filrak (#2330)
@@ -329,7 +933,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - `store/lib/search` has been moved to `core/lib/search` - @lukeromanowicz (#2225)
 - `store/lib/multistore` has been moved to `core/lib/multistore` - @lukeromanowicz (#2224)
 - BaseSelect syntax improvements - @jszczech (#2237)
-- Optional cart discounts display on  side cart - @mcspronko (#1758)
+- Optional cart discounts display on side cart - @mcspronko (#1758)
 - Special price dates checking - backport of @igloczek's (#2245)
 - Category filters reset functionality on mobile - @vue-kacper, @patzick, @renatocason (#2262)
 - Improve sortBy mobile view - @martaradziszewska (#2251)
@@ -362,12 +966,16 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Configurable options attribute descriptor - @pkarw (#2384)
 
 ## [1.7.3] - 2019-01-31
+
 ### Fixed
+
 - Output cache between build, cache versioning added - @igloczek (#2309)
 - Missing `no-ssr` wrapper around user specific content, which leads to broken app in production mode - @igloczek (#2314)
 
 ## [1.7.2] - 2019-01-28
+
 ### Fixed
+
 - clear search filters on mobile - @patzick (#2282)
 - SSR problem on checkout page on reload - @vue-kacper (#2220)
 - Improved offline mode handlers - @pkarw (#2217)
@@ -377,9 +985,11 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - SSR detection in components - @patzick (#2173)
 
 ### Added
+
 - Hotjar extension (#840)
 
 ### Changed
+
 - compress banner images - @patzick (#2280)
 - Dynamic attributes loader (#2137)
 - Dynamic categories prefetching (#2076)
@@ -387,16 +997,21 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Support regional characters in urls - Backport of @aekal's (#2243)
 
 ### Added
+
 - Translations of banners - @patzick (#2276)
 - Banners title background on mobile - @patzick (#2272)
 - New main site look - @patzick (#2266)
 
 ## [1.7.1] - 2019-01-15
+
 ### Fixed
+
 - Corrected scrolled sidebar menu position
 
 ## [1.7.0] - 2019-01-15
+
 ### Added
+
 - Dynamic categories prefetching — @pkarw #2100
 - Per-route codesplitting for SSR pages — @patzick #2068
 - async/await support — @patzick #2092
@@ -410,6 +1025,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Out of the box GZIP compression and sourcemap removal in prod mode — @patzick #2186
 
 ### Changed / Improved
+
 - Invalidate output cache using POST - @Cyclonecode #2084
 - NGNIX installation improvements for docs — @janmyszkier #2080
 - HTML semantics improvements — @patzick #2094
@@ -426,6 +1042,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - IndexedDb changed to LocalStorage + ServiceWorker native caching (#2112)
 
 ### Fixed
+
 - Fix Notification.vue compiling issue on prod - @ladrua #2079
 - Fix wishlist toggle bug — @shkodasv #2086
 - findConfigurableChildAsync — fix checking stock for configurable child — @afirlejczyk #2097
@@ -447,19 +1064,24 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Fix Cart Configurable Item pulled from Magento loaded as Simple — @pkarw @valeriish #2169 #2181
 
 ### Depreciated
+
 - extendStore depreciation - @filrak #2143
 - ValidationError class depreciation - @filrak #2143
 
 ## [1.6.0] - 2018-12-05
+
 ### Added
+
 - Lazy loading for SSR and non-SSR routes
 - app splitted into modules
 
 ### Removed
+
 - `vsf-payment-stripe` module integration removed from core
 
 ### Changed
-- There is new config option `config.orders.directBackendSync` that changes the behavior of placing an order. Please do read  [more on this change](https://github.com/DivanteLtd/vue-storefront/commit/e73f2ca19a5d33a39f8b0fd6346543eced24167e) and [more on vue-storefront-api change](https://github.com/DivanteLtd/vue-storefront-api/commit/80c497f72362c72983db4fdcac14c8ba6f8729a8)
+
+- There is new config option `config.orders.directBackendSync` that changes the behavior of placing an order. Please do read [more on this change](https://github.com/DivanteLtd/vue-storefront/commit/e73f2ca19a5d33a39f8b0fd6346543eced24167e) and [more on vue-storefront-api change](https://github.com/DivanteLtd/vue-storefront-api/commit/80c497f72362c72983db4fdcac14c8ba6f8729a8)
 - ProductSlider, ProductLinks, ProductListing moved to theme.
 - Many theme-related logic moved to theme (+ deleted empty core components just with `name`)
 - Components required for backward compatibility moved to `compatibility` folder. For all this files you just need to add `compatibility` after `core` in import path to make them work like before.
@@ -474,6 +1096,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 ## [1.5.0] - 2018-10-22
 
 ### Added
+
 - Contact form mailer - #1875 - Akbar Abdrakhmanov @akbarik
 - oauth2 configuration in setup - #1865 - Krister Andersson @Cyclonecode
 - GraphQL schema extendibility in the API - Yoann Vié
@@ -482,9 +1105,11 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - 'Apply' filters button on mobile category - #1709 - Damian Fiałkiewicz @Aekal
 
 ### Changed
+
 - New Modules API, and base modules (cart, wishlist, newsletter ...) refactored [read more...](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/api-modules/about-modules.md) - Filip Rakowski @filrak
 
 ### Fixed
+
 - The `regionId` field added to Order interface - #1258 - Jim Hil @jimcreate78
 - SSR Memory leaks fixed - #1882 Tomasz Duda @tomasz-duda
 - E2E tests fixed - #1861 - Patryk Tomczyk @patzik
@@ -496,6 +1121,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 ## [1.4.0] - 2018-10-05
 
 ### Added
+
 - GraphQL support - #1616 - Yuri Boyko @yuriboyko, Vladimir Plastovets @VladimirPlastovets => [PHOENIX MEDIA](https://www.phoenix-media.eu/)
 - Layout switching + Advanced output mechanisms - #1787 - Piotr Karwatka @pkarw
 - Dynamic config reload - #1800 - Piotr Karwatka @pkarw
@@ -506,9 +1132,11 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - Console silent mode (disabled by default) - #1752 - Piotr Karwatka - @pkarw
 
 ### Changed
+
 - Please check the [Upgrade notes](https://github.com/DivanteLtd/vue-storefront/blob/develop/doc/Upgrade%20notes.md) for the full list
 
 ### Fixed
+
 - `docker-compose.yml` files updated - @kovinka
 - Non-core translations moved to theme resource files (i18n) - #1747 - David Rouyer @DavidRouyer
 - Non-core assets moved to the theme - #1739, #1740 - David Rouyer @DavidRouyer
@@ -522,6 +1150,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 ## [1.3.0] - 2018-08-31
 
 ### Added
+
 - TypeScript support - please check [TypeScript Action Plan](https://github.com/DivanteLtd/vue-storefront/blob/master/docs/guide/basics/typescript.md) for details
 - New `core/modules` added regarding the [Refactor to modules plan](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/api-modules/refactoring-to-modules.md)
 - Price tier's support #1625
@@ -531,15 +1160,18 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 - dynamic port allocation #1511
 
 ### Removed
+
 - unused `libs`, `components`, `core/api/cart` webpack aliases
 - `global.$VS` has been replaced with `rootStore` #1624
 
 ### Changed
+
 - `core` directory is now a `@vue-storefront/core` package, webpack alias and all related imports reflect this change [#1513]
 - `core/api` renamed to `core/modules`, mixin features moved to `core/modules/module_name/features`
 - `core/lib/i18n` moved into separate `@vue-storefront/i18n` package
 
 ### Fixed
+
 - installer paths are now normalized (to support paths including spaces) #1645
 - status check added to the configurable_children products #1639
 - product info update when clicking the related products #1601
@@ -554,12 +1186,14 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 ## [1.2.0] - 2018-08-01
 
 ### Fixed
+
 - Improved integration tests [#1471]
 - Minor taxcalc.js improvements [#1467]
 - Search by SKU fixed [#1455]
 - ProductList dbl click fix [#1438]
 
 ### Added
+
 - Docker support for vue-storefront
 - Production config docs added [#1450]
 - Integration tests for Compare products added [#1422]
@@ -572,6 +1206,7 @@ Additional migration tips are available [here](https://github.com/DivanteLtd/vue
 Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-storefront/blob/master/doc/Upgrade%20notes.md)**
 
 ### Fixed
+
 - Zip Code validation [#1372]
 - Get inpspired block [#968]
 - Favicon [#836]
@@ -583,6 +1218,7 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - IndexedDB locking issue
 
 ### Added
+
 - Added PM2 process manager [#1162]
 - Added billing data phone number support [#1338]
 - Added validation labels + generic control for CountrySelector [#1227]
@@ -594,47 +1230,61 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Production ready Docker config for vue-storefront-api
 
 ## [1.0.5] - 2018-06-04
+
 ### Fixed
+
 - Shipping region fix
 - Hotfix for missing config.storeViews.multistore check
 - Minor fixes
 
 ## [1.0.4] - 2018-06-02
+
 ### Fixed
+
 - defaultCountry fix for IT
 - Tax classes hotfix
 - tax_class_id is required by taxcalc - restored along with version inc
 - Minor fixes
 
 ## [1.0.3] - 2018-06-02
+
 ### Fixed
+
 - Minor fixes
 
 ## [1.0.2] - 2018-06-02
+
 ### Fixed
+
 - vue-storefront-stripe renamed to vsf-payment-stripe hotfix
 - Minor fixes
 
 ## [1.0.1] - 2018-05-31
+
 ### Fixed
+
 - Minor fixes
 
 ## [1.0.0] - 2018-05-30
+
 ### Added
-- __Multistore__ - now it's possible to manage the store views with all the features like translations, custom category, and products content, shipping rates - basically all Magento2 features are supported! You can read more on how to setup Multistore here.
-- __Bundle products__ - support for the Magento-like bundle products with all the custom options, pricing rules etc.
-- __Configurable options__ - that allows users to select radio/checkbox options + put some custom notes (textboxes) on the products they like to order,
-- __Crossell, Upsell, Related products__ - are now synchronized with Magento2,
-- __Webpack4 support__ - we've migrated from Webpack2 -> Webpack4 and now the build process takes much less time while providing some cool new features,
-- __Core components refactor__ - without changing APIs, we've stripped the core components from s to improve the performance and improve the code readability,
-- __PWA Manifest fixes__ - iOS PWA support required us to adjust some settings,
-- __Improved translations__ - we're constantly tweaking the translation files :) We've just added it-IT and pl-PL (finally!) support recently
-- __Improved Travis-CI pipeline__ - and added support for end-2-end testing,
-- __Lot of bugfixes + UX fixes__ - countless hours spent on improving the code and UI quality!
-- __Please check it out:__ visit: https://demo.vuestorefront.io/
+
+- **Multistore** - now it's possible to manage the store views with all the features like translations, custom category, and products content, shipping rates - basically all Magento2 features are supported! You can read more on how to setup Multistore here.
+- **Bundle products** - support for the Magento-like bundle products with all the custom options, pricing rules etc.
+- **Configurable options** - that allows users to select radio/checkbox options + put some custom notes (textboxes) on the products they like to order,
+- **Crossell, Upsell, Related products** - are now synchronized with Magento2,
+- **Webpack4 support** - we've migrated from Webpack2 -> Webpack4 and now the build process takes much less time while providing some cool new features,
+- **Core components refactor** - without changing APIs, we've stripped the core components from s to improve the performance and improve the code readability,
+- **PWA Manifest fixes** - iOS PWA support required us to adjust some settings,
+- **Improved translations** - we're constantly tweaking the translation files :) We've just added it-IT and pl-PL (finally!) support recently
+- **Improved Travis-CI pipeline** - and added support for end-2-end testing,
+- **Lot of bugfixes + UX fixes** - countless hours spent on improving the code and UI quality!
+- **Please check it out:** visit: https://demo.vuestorefront.io/
 
 ## [1.0.0-rc.3] - 2018-04-29
+
 ### Added
+
 - Performance tweaks: improved service worker config, reduced JSONs, two-stage caching,
 - User token auto refresh,
 - My Account fixes
@@ -647,7 +1297,9 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Product and Category page refactoring
 
 ## [1.0.0-rc.2] - 2018-03-29
+
 ### Added
+
 - Basic Magento 1.9 support,
 - Translations: ES, DE, NL, FR
 - Lerna support for managing the npm packages within the one repository,
@@ -660,7 +1312,9 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Other fixes.
 
 ## [1.0.0-rc.0] - 2018-03-01
+
 ### Added
+
 - i18n (internationalization) support for the UI,
 - Support for Magento2 dynamic cart totals - which enables the shopping cart rules mechanism of Magento to work with VS,
 - ESlint-plugin-vue installed,
@@ -674,7 +1328,9 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Droppoints shipping methods (NL support) added.
 
 ## [0.4.0] - 2018-01-28
+
 ### Added
+
 - Improved theming support + B2B product catalog theme included (original github repo); it's PoC made in just one week! Isn't it amazing that you can customize VS in just one week to this extent? :)
 - Pimcore support (more on this, github repo)
 - Customer's dashboard + address book, integration with Checkout
@@ -689,7 +1345,9 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Lot of smaller tweaks
 
 ## [0.3.0] - 2017-12-21
+
 ### Added
+
 - Bundle products support,
 - Tax calculation regarding the Magento's logic for different rates per countries, states.
 - User registration, log-in, password reset
@@ -707,7 +1365,9 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - Updated installer with support for Linux and MacOSX
 
 ## [0.2.1-alpha.0] - 2017-11-16
+
 ### Added
+
 - Homepage
 - Category page
 - Product page
@@ -722,5 +1382,7 @@ Please keep an eye on the **[UPGRADE NOTES](https://github.com/DivanteLtd/vue-st
 - RWD (except some checkout issues to be fixed)
 
 ## [0.2.0-alpha.0] - 2017-11-15
+
 ### Fixed
+
 - Lazy loaded blocks size fixed

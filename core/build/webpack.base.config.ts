@@ -1,18 +1,14 @@
+import { buildLocaleIgnorePattern } from './../i18n/helpers';
 import path from 'path';
-import config from 'config';
 import fs from 'fs';
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import VueLoaderPlugin from 'vue-loader/lib/plugin';
 import autoprefixer from 'autoprefixer';
 import HTMLPlugin from 'html-webpack-plugin';
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 import webpack from 'webpack';
 import dayjs from 'dayjs';
 
-fs.writeFileSync(
-  path.resolve(__dirname, './config.json'),
-  JSON.stringify(config)
-)
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 // eslint-disable-next-line import/first
 import themeRoot from './theme-path';
@@ -25,12 +21,6 @@ const themedIndex = path.join(themeRoot, '/templates/index.template.html')
 const themedIndexMinimal = path.join(themeRoot, '/templates/index.minimal.template.html')
 const themedIndexBasic = path.join(themeRoot, '/templates/index.basic.template.html')
 const themedIndexAmp = path.join(themeRoot, '/templates/index.amp.template.html')
-
-const translationPreprocessor = require('@vue-storefront/i18n/scripts/translation.preprocessor.js')
-translationPreprocessor([
-  path.resolve(__dirname, '../../node_modules/@vue-storefront/i18n/resource/i18n/'),
-  path.resolve(__dirname, themeResources + '/i18n/')
-], config)
 
 const postcssConfig = {
   loader: 'postcss-loader',
@@ -48,10 +38,11 @@ const isProd = process.env.NODE_ENV === 'production'
 // todo: usemultipage-webpack-plugin for multistore
 export default {
   plugins: [
+    new webpack.ContextReplacementPlugin(/dayjs[/\\]locale$/, buildLocaleIgnorePattern()),
     new webpack.ProgressPlugin(),
-    // new BundleAnalyzerPlugin({
-    //   generateStatsFile: true
-    // }),
+    /* new BundleAnalyzerPlugin({
+      generateStatsFile: true
+    }), */
     new CaseSensitivePathsPlugin(),
     new VueLoaderPlugin(),
     // generate output HTML
@@ -117,7 +108,10 @@ export default {
       'theme/resource': themeResources,
 
       // Backward compatible
-      '@vue-storefront/core/store/lib/multistore': path.resolve(__dirname, '../lib/multistore.ts')
+      '@vue-storefront/core/lib/store/multistore': path.resolve(__dirname, '../lib/multistore.ts'),
+      'src/modules/order-history/components/UserOrders': path.resolve(__dirname, '../../core/modules/order/components/UserOrdersHistory'),
+      '@vue-storefront/core/modules/social-share/components/WebShare': path.resolve(__dirname, '../../src/themes/default/components/theme/WebShare.vue'),
+      '@vue-storefront/core/helpers/initCacheStorage': path.resolve(__dirname, '../lib/storage-manager.ts')
     }
   },
   module: {
@@ -199,6 +193,10 @@ export default {
         test: /\.(graphqls|gql)$/,
         exclude: /node_modules/,
         loader: ['graphql-tag/loader']
+      },
+      {
+        test: /core\/build\/config\.json$/,
+        loader: path.resolve('core/build/purge-config.js')
       }
     ]
   }

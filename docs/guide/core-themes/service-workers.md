@@ -13,7 +13,7 @@ The service-worker source code for `vue-storefront` is pre-compiled with Babel p
 
 After changing anything in `{themename}/service-worker/index.js`, despite you're in `yarn dev` auto  reloading mode, you need to do two things:
 
-1.Recompile app (which regenerates service-worker):
+1. Recompile app (which regenerates service-worker):
    `yarn build`
 
 2. Reload Service Worker in Dev Tools (in Chrome, just click **"Unregister"** and reload the page, and a new Service Worker will be installed).
@@ -46,7 +46,7 @@ It allows you to send data to the Service Worker. For example, when the order is
    * @param {Object} product data format for products is described in /doc/ElasticSearch data formats.md
    */
   [types.CHECKOUT_PLACE_ORDER] (state, order) {
-    const ordersCollection = Vue.prototype.$db.ordersCollection
+    const ordersCollection = StorageManager.get('orders')
     const orderId = entities.uniqueEntityId(order) // timestamp as a order id is not the best we can do but it's enough
     order.id = orderId.toString()
     order.transmited = false
