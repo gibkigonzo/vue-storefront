@@ -52,6 +52,7 @@ export default {
 
 <style lang="scss" scoped>
 .section {
+  overflow-x: hidden;
   margin-top: var(--spacer-base);
 }
 
